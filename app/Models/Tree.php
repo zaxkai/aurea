@@ -8,6 +8,33 @@ class Tree extends Model
 {
     protected $fillable = ['user_id', 'growth_percentage'];
 
+    public static function growthStageForCompletedItems(int $completedItems): int
+    {
+        return match (true) {
+            $completedItems >= 10 => 4,
+            $completedItems >= 6 => 3,
+            $completedItems >= 3 => 2,
+            $completedItems >= 1 => 1,
+            default => 0,
+        };
+    }
+
+    public function completedGrowthItemsCount(): int
+    {
+        $user = $this->user;
+        $completedTasks = $user->tasks()->where('is_done', true)->count();
+        $completedHabits = $user->habits()
+            ->where('is_active', true)
+            ->whereHas('logs', function ($query): void {
+                $query
+                    ->whereDate('log_date', today())
+                    ->whereColumn('habit_logs.value_logged', '>=', 'habits.target_value');
+            })
+            ->count();
+
+        return $completedTasks + $completedHabits;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

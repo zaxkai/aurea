@@ -227,53 +227,12 @@
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100/60 flex flex-col items-center justify-between text-center">
                     <h3 class="font-bold text-base text-navy mb-2">Growth Tree Preview</h3>
 
-                    <!-- Stylized Pine Tree with Dynamic Fill -->
-                    <div class="relative w-36 h-40 my-2 flex items-center justify-center">
-                        <svg viewBox="0 0 100 120" class="w-full h-full">
-                            <defs>
-                                <clipPath id="treeClip">
-                                    <!-- Pine tree shape -->
-                                    <polygon points="50,10 75,40 65,40 85,70 70,70 90,95 10,95 30,70 15,70 35,40 25,40" />
-                                </clipPath>
-                            </defs>
+                    <x-growth-tree :stage="$treeStage" compact />
+                    <p class="text-xs font-medium text-gray-500">{{ $completedGrowthItemsCount }} target selesai</p>
 
-                            <!-- Background / Outline -->
-                            <polygon points="50,10 75,40 65,40 85,70 70,70 90,95 10,95 30,70 15,70 35,40 25,40"
-                                     fill="none"
-                                     stroke="#0B1224"
-                                     stroke-width="2.5"
-                                     stroke-linejoin="round" />
-
-                            <!-- Dynamic fill from bottom -->
-                            <g clip-path="url(#treeClip)">
-                                @php
-                                    $growth = min(100, max(0, $tree->growth_percentage ?? 30));
-                                    $fillY = 95 - (($growth / 100) * 85);
-                                    $fillH = ($growth / 100) * 85;
-                                @endphp
-                                <rect x="0" y="{{ $fillY }}" width="100" height="{{ $fillH }}" fill="#0B1224" />
-
-                                <!-- Percentage text placed inside the tree -->
-                                @if ($growth > 15)
-                                    <text x="50" y="{{ min(90, $fillY + ($fillH / 2) + 4) }}"
-                                          text-anchor="middle"
-                                          fill="#FFFFFF"
-                                          font-size="11"
-                                          font-weight="bold"
-                                          font-family="Figtree, sans-serif">
-                                        {{ $growth }}%
-                                    </text>
-                                @endif
-                            </g>
-
-                            <!-- Tree Trunk -->
-                            <rect x="44" y="95" width="12" height="15" fill="#0B1224" rx="1" />
-                        </svg>
-                    </div>
-
-                    <button class="text-xs font-semibold text-gray-500 hover:text-navy transition mt-2">
+                    <a href="{{ route('habit-growth-tree') }}" class="mt-2 text-xs font-semibold text-gray-500 transition hover:text-navy">
                         See full
-                    </button>
+                    </a>
                 </div>
 
             </div>

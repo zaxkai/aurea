@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\CheckIn;
+use App\Models\Tree;
 use App\Models\User;
 use App\Services\HabitRecommendationService;
 use App\Services\PatternDetectionService;
@@ -461,6 +462,7 @@ class Dashboard extends Component
 
         $tree = $user->tree()->firstOrCreate([], ['growth_percentage' => 30]);
         $tree->refreshGrowthPercentage();
+        $completedGrowthItemsCount = $tree->completedGrowthItemsCount();
 
         return view('livewire.dashboard', [
             'moods' => $this->moods,
@@ -471,6 +473,8 @@ class Dashboard extends Component
             'freeHabitLimit' => $freeHabitLimit,
             'activeHabitCount' => $progressHabits->count(),
             'tree' => $tree,
+            'completedGrowthItemsCount' => $completedGrowthItemsCount,
+            'treeStage' => Tree::growthStageForCompletedItems($completedGrowthItemsCount),
             'calendarDays' => $this->getCalendarDays(),
             'calendarTitle' => Carbon::create($this->calendarYear, $this->calendarMonth, 1)->format('F Y'),
         ]);

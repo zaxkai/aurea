@@ -6,7 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="icon" type="image/png" href="{{ asset('images/logo_aurea.png') }}">
 
-        <title>{{ config('app.name', 'AUREA - AI for User Resilience & Everyday Awareness') }}</title>
+        <title>{{ config('app.name', 'Aurea') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

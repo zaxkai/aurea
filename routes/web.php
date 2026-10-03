@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\PremiumController;
+use App\Models\Tree;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -23,8 +24,12 @@ Route::get('habit-growth-tree', function () {
     $user = auth()->user();
     $tree = $user->tree()->firstOrCreate([], ['growth_percentage' => 30]);
     $tree->refreshGrowthPercentage();
+    $completedGrowthItemsCount = $tree->completedGrowthItemsCount();
 
-    return view('habit-growth-tree');
+    return view('habit-growth-tree', [
+        'completedGrowthItemsCount' => $completedGrowthItemsCount,
+        'treeStage' => Tree::growthStageForCompletedItems($completedGrowthItemsCount),
+    ]);
 })
     ->middleware(['auth', 'verified', 'onboarding'])
     ->name('habit-growth-tree');

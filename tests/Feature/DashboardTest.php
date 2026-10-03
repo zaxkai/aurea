@@ -13,6 +13,8 @@ use App\Services\WellbeingScoringService;
 use Livewire\Livewire;
 
 it('renders dashboard successfully for authenticated user', function () {
+    config(['app.name' => 'Aurea']);
+
     $user = User::factory()->create([
         'name' => 'Julian Casablancas',
         'current_streak' => 30,
@@ -22,6 +24,7 @@ it('renders dashboard successfully for authenticated user', function () {
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
+        ->assertSee('<title>Aurea</title>', false)
         ->assertSee('Julian')
         ->assertSee('Days of Streak');
 });
@@ -231,7 +234,7 @@ it('can toggle checklist habit and update value', function () {
         ->and($log->value_logged)->toBe(1);
 });
 
-it('grows the tree to one hundred percent when every task and active habit is complete', function () {
+it('shows a young tree and keeps daily goal progress at one hundred percent when all goals are complete', function () {
     $user = User::factory()->create([
         'onboarding_completed_at' => now(),
     ]);
@@ -266,12 +269,12 @@ it('grows the tree to one hundred percent when every task and active habit is co
 
     $this->actingAs($user)
         ->get(route('habit-growth-tree'))
-        ->assertSee('100%');
+        ->assertSee(asset('images/habit-growth-tree/pohon3.png'), false);
 
     expect($tree->fresh()->growth_percentage)->toBe(100);
 });
 
-it('includes incomplete tasks when calculating tree growth', function () {
+it('shows a sprout and includes incomplete tasks in daily goal progress', function () {
     $user = User::factory()->create([
         'onboarding_completed_at' => now(),
     ]);
@@ -304,7 +307,9 @@ it('includes incomplete tasks when calculating tree growth', function () {
 
     $this->actingAs($user)
         ->get(route('habit-growth-tree'))
-        ->assertSee('67%');
+        ->assertSee(asset('images/habit-growth-tree/pohon1.png'), false);
+
+    expect($user->tree()->first()->growth_percentage)->toBe(67);
 });
 
 it('can submit detailed health metrics to compute wellbeing index', function () {

@@ -1,3 +1,71 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes growth-tree-leaf-fall {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, -1rem, 0) rotate(0deg);
+    }
+
+    12% {
+        opacity: 0.9;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate3d(2.5rem, 17rem, 0) rotate(420deg);
+    }
+}
+
+.tree-leaf {
+    position: absolute;
+    top: 10%;
+    width: 0.7rem;
+    height: 1rem;
+    border-radius: 0 100% 0 100%;
+    background: #2ee0e0;
+    animation: growth-tree-leaf-fall 6s linear infinite;
+}
+
+.tree-leaf:nth-child(1) {
+    left: 14%;
+    animation-delay: -4.2s;
+}
+
+.tree-leaf:nth-child(2) {
+    left: 29%;
+    animation-delay: -1.7s;
+    animation-duration: 7s;
+}
+
+.tree-leaf:nth-child(3) {
+    left: 43%;
+    animation-delay: -5.1s;
+    animation-duration: 6.5s;
+}
+
+.tree-leaf:nth-child(4) {
+    left: 58%;
+    animation-delay: -2.8s;
+    animation-duration: 7.5s;
+}
+
+.tree-leaf:nth-child(5) {
+    left: 72%;
+    animation-delay: -0.9s;
+    animation-duration: 6.8s;
+}
+
+.tree-leaf:nth-child(6) {
+    left: 84%;
+    animation-delay: -3.6s;
+    animation-duration: 7.2s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tree-leaf {
+        animation: none;
+        opacity: 0;
+    }
+}
