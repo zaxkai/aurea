@@ -1,58 +1,198 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/favicon.ico" width="80" alt="Aurea Logo" />
+  <h1 align="center">🌿 Aurea — Mental Health & Habit Growth Companion</h1>
+  <p align="center">
+    <strong>Aplikasi Pelacak Kesehatan Mental, Habit Tracker Gamified (Habit Growth Tree), dan AI Companion Berbasis Laravel 13 & Livewire 3.</strong>
+  </p>
+  <p align="center">
+    <a href="https://php.net"><img src="https://img.shields.io/badge/PHP-8.3-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP 8.3"></a>
+    <a href="https://laravel.com"><img src="https://img.shields.io/badge/Laravel-13.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel 13"></a>
+    <a href="https://livewire.laravel.com"><img src="https://img.shields.io/badge/Livewire-3.x-4E5BA6?style=for-the-badge&logo=livewire&logoColor=white" alt="Livewire 3"></a>
+    <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS"></a>
+    <a href="https://ai.google.dev"><img src="https://img.shields.io/badge/Google_Gemini-AI-4285F4?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Google Gemini AI"></a>
+    <a href="https://midtrans.com"><img src="https://img.shields.io/badge/Payment-Midtrans-00A9E0?style=for-the-badge" alt="Midtrans Payment"></a>
+  </p>
 </p>
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📌 Tentang Aurea
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Aurea** adalah platform web modern yang dirancang untuk membantu pengguna—khususnya remaja dan dewasa muda—dalam mengelola kesehatan mental, membangun kebiasaan positif (*habit tracking*), serta mendapatkan pendampingan emosional yang responsif dan aman melalui kecerdasan buatan (**AI Aurea**).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Dengan memadukan pendekatan **gamifikasi (Habit Growth Tree)**, **pencatatan jurnal berbasis AI**, dan **pelacakan suasana hati harian**, Aurea menciptakan ruang yang hangat, interaktif, dan bebas dari penghakiman untuk pertumbuhan pribadi pengguna.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## ✨ Fitur-Fitur Utama
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 🌳 1. Habit Growth Tree (Gamifikasi Kebiasaan)
+- Visualisasi pertumbuhan pohon personal yang tumbuh berdasar kebiasaan (*habits*) positif yang diselesaikan harian.
+- Sistem progres bertahap (*growth percentage* dan *growth stages*) yang mendorong konsistensi tanpa tekanan berlebih.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 🤖 2. AI Aurea Companion
+- Teman ngobrol AI berbasis **Google Gemini (Gemini 3.8 Flash & Fallback Chain)** yang empatik dan suportif.
+- **Validasi Emosi & Refleksi**: Mendengarkan tanpa menghakimi dan memberikan panduan penanganan stres (*coping mechanism*).
+- **Protokol Keselamatan**: Dilengkapi pendeteksi risiko diri (*self-harm / crisis detection*) untuk mengarahkan pengguna ke bantuan profesional atau orang dewasa terpercaya.
+- **Resilient Model Architecture**: Memiliki mekanisme fallback otomatis antar model AI jika terjadi kendala kuota atau *rate-limiting*.
 
-## Agentic Development
+### 📊 3. Daily Mood & Check-in Tracking
+- Pencatatan suasana hati harian (*MoodType*) beserta log *check-in*.
+- Deteksi pola emosi (*Pattern Detection Service*) dan perhitungan skor kesejahteraan (*Wellbeing Scoring Service*).
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 📖 4. Smart Digital Journaling
+- Wadah refleksi diri interaktif untuk menuangkan pikiran dan perasaan.
+- **Ringkasan & Saran AI**: Otomatis menganalisis isi jurnal dan memberikan ringkasan serta saran praktis yang hangat.
 
-```bash
-composer require laravel/boost --dev
+### 📝 5. Personal Onboarding & Mental Profiling
+- Kuesioner *onboarding* interaktif untuk memetakan kondisi mental awal dan preferensi pengguna.
+- Pembuatan *Mental Profile* kustom untuk pengalaman yang disesuaikan (*personalized*).
 
-php artisan boost:install
+### 💎 6. Freemium & Premium Subscription
+- Pembatasan kuota harian prompt AI untuk pengguna gratis.
+- Integrasi **Midtrans Payment Gateway** untuk aktivasi keanggotaan Premium tanpa batas kuota.
+
+### 🔑 7. Autentikasi & Keamanan
+- Autentikasi berbasis Laravel Breeze + Livewire.
+- Dukungan **Social Login** (OAuth Google) menggunakan Laravel Socialite.
+
+---
+
+## 🛠️ Tech Stack & Arsitektur
+
+| Kategori | Teknologi / Library |
+| :--- | :--- |
+| **Framework Backend** | PHP 8.3, Laravel 13 |
+| **Frontend Stack** | Livewire 3, Livewire Volt, Alpine.js, Tailwind CSS |
+| **Asset Bundler** | Vite |
+| **Database & ORM** | MySQL / SQLite, Eloquent ORM |
+| **Kecerdasan Buatan (AI)** | Google Gemini API (via HTTP Client & Custom Service) |
+| **Payment Gateway** | Midtrans PHP SDK |
+| **Autentikasi** | Laravel Breeze & Laravel Socialite |
+| **Testing & Formatting** | Pest PHP, Laravel Pint |
+
+---
+
+## 📁 Struktur Proyek Utama
+
+```text
+aurea/
+├── app/
+│   ├── Enums/               # Enum MoodType dan tipe data khusus
+│   ├── Exceptions/          # AiPromptLimitReachedException & kustom penanganan exception
+│   ├── Http/
+│   │   ├── Controllers/     # CheckInController, PremiumController, SubscriptionController, SocialiteController
+│   │   └── Middleware/      # EnsureOnboardingCompleted middleware
+│   ├── Livewire/            # Component Livewire (AiAurea, JournalPage, Dashboard, Settings)
+│   ├── Models/              # User, Habit, Tree, Journal, CheckIn, ChatSession, Subscription, dll.
+│   └── Services/            # ChatbotService, WellbeingScoringService, PatternDetectionService, HabitRecommendationService
+├── database/
+│   ├── migrations/          # Migrasi struktur basis data
+│   └── seeders/             # Data awal untuk onboarding & testing
+├── resources/
+│   └── views/               # Blade views, Volt components, dan layout aplikasi
+└── routes/
+    ├── web.php              # Rute utama aplikasi
+    └── auth.php             # Rute autentikasi
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## 🚀 Panduan Instalasi & Jalankan Lokal
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Ikuti langkah-langkah di bawah ini untuk menjalankan proyek Aurea di lingkungan lokal Anda:
 
-## Code of Conduct
+### 1. Prasyarat System
+- **PHP** >= 8.3
+- **Composer** >= 2.x
+- **Node.js** >= 18.x & NPM
+- **MySQL** / **SQLite** (dapat menggunakan Laragon, XAMPP, atau DB local)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 2. Clone Repository
+```bash
+git clone https://github.com/username/aurea.git
+cd aurea
+```
 
-## Security Vulnerabilities
+### 3. Install Dependencies
+```bash
+# Install PHP dependencies
+composer install
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Install JavaScript dependencies
+npm install
+```
 
-## License
+### 4. Konfigurasi Environment (`.env`)
+Salin file `.env.example` menjadi `.env`:
+```bash
+cp .env.example .env
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Buka file `.env` dan sesuaikan konfigurasi basis data & API Key:
+```env
+APP_NAME=Aurea
+APP_URL=http://localhost:8000
+
+# Konfigurasi Database (Contoh SQLite)
+DB_CONNECTION=sqlite
+
+# Kunci API Google Gemini (Wajib untuk fitur AI Aurea)
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Konfigurasi Payment Gateway Midtrans (Opsional untuk fitur Premium)
+MIDTRANS_SERVER_KEY=your_midtrans_server_key
+MIDTRANS_CLIENT_KEY=your_midtrans_client_key
+MIDTRANS_IS_PRODUCTION=false
+```
+
+### 5. Generate Application Key & Database Migration
+```bash
+# Generate APP_KEY
+php artisan key:generate
+
+# Jalankan migrasi basis data beserta seeder
+php artisan migrate --seed
+```
+
+### 6. Jalankan Server Lokal
+Gunakan perintah berikut untuk menjalankan server Laravel dan Vite secara bersamaan:
+```bash
+composer run dev
+```
+atau secara terpisah:
+```bash
+# Terminal 1: Server Laravel
+php artisan serve
+
+# Terminal 2: Vite Dev Server
+npm run dev
+```
+
+Buka browser Anda dan akses: `http://localhost:8000` (atau `http://127.0.0.1:8000`).
+
+---
+
+## 🧪 Pengujian & Code Styling
+
+Proyek ini dilengkapi dengan skrip pengujian berbasis **Pest PHP** dan formatter **Laravel Pint**.
+
+```bash
+# Jalankan pengujian unit & fitur (Pest)
+composer run test
+
+# Jalankan pengemasan/format kode PHP otomatis (Laravel Pint)
+vendor/bin/pint
+```
+
+---
+
+## 📜 Lisensi
+
+Proyek **Aurea** dirilis di bawah [MIT License](LICENSE).
+
+---
+
+<p align="center">
+  Dibuat dengan 💙 oleh tim <strong>Aurea</strong> untuk mendukung kesejahteraan emosional pengguna.
+</p>
