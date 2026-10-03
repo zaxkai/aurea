@@ -1,5 +1,5 @@
 <div>
-    <h1 class="text-3xl font-bold text-navy">Settings</h1>
+    <h1 class="text-3xl font-bold text-navy">Pengaturan</h1>
     <p class="text-gray-500 mb-8">Atur akun dan preferensimu di sini.</p>
 
     <div class="bg-white rounded-2xl p-6 shadow-sm mb-6">
@@ -35,6 +35,16 @@
             Data journal dan hasil profile setup kamu dienkripsi dan hanya dipakai untuk personalisasi Aurea.
         </p>
     </div>
+
+    @if (auth()->user()->isPremium())
+        <div class="bg-white rounded-2xl p-6 shadow-sm mb-6 border border-aurea">
+            <h2 class="font-semibold text-lg mb-2 text-navy">Status Premium</h2>
+            <p class="text-sm text-gray-500 mb-4">Kontrol ini hanya untuk mode demo agar juri dapat membandingkan pengalaman Free dan Premium.</p>
+            <button wire:click="deactivatePremium" class="rounded-full border border-navy px-5 py-2 text-sm font-semibold text-navy transition hover:bg-gray-50">
+                Kembali ke Free
+            </button>
+        </div>
+    @endif
 
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-red-100">
         <h2 class="font-semibold text-lg mb-2 text-red-600">Zona Berbahaya</h2>

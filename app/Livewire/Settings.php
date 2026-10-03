@@ -7,8 +7,11 @@ use Livewire\Component;
 class Settings extends Component
 {
     public string $name = '';
+
     public string $email = '';
+
     public bool $notifEmail = true;
+
     public bool $notifPush = true;
 
     public function mount(): void
@@ -25,6 +28,13 @@ class Settings extends Component
         ]);
 
         session()->flash('saved', 'Perubahan tersimpan.');
+    }
+
+    public function deactivatePremium(): void
+    {
+        auth()->user()->deactivatePremium();
+
+        session()->flash('saved', 'Akunmu kembali ke Free. Data yang sudah tersimpan tetap aman.');
     }
 
     public function deleteAccount(): void

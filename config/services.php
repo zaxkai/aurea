@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+        'models' => array_values(array_unique([
+            env('GEMINI_MODEL', 'gemini-3.8-flash'),
+            'gemini-3.7-flash',
+            'gemini-3.5-flash-lite',
+            'gemini-2.5-flash',
+            'gemma-4-31b-it',
+        ])),
+    ],
+
 ];

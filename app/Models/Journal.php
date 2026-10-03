@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Journal extends Model
 {
-    protected $fillable = ['user_id', 'title', 'content', 'mood'];
+    protected $fillable = ['user_id', 'title', 'content', 'mood', 'summary', 'advice', 'journal_date'];
 
     protected $casts = [
         'content' => 'encrypted',
+        'summary' => 'encrypted',
+        'advice' => 'encrypted',
+        'journal_date' => 'date',
     ];
 
     public function user()
