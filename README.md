@@ -1,5 +1,4 @@
 <p align="center">
-  <img src="public/favicon.ico" width="80" alt="Aurea Logo" />
   <h1 align="center">🌿 Aurea — Mental Health & Habit Growth Companion</h1>
   <p align="center">
     <strong>Aplikasi Pelacak Kesehatan Mental, Habit Tracker Gamified (Habit Growth Tree), dan AI Companion Berbasis Laravel 13 & Livewire 3.</strong>
