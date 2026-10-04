@@ -24,9 +24,9 @@ class ChatbotService
 
     // Coba model utama dulu, kalau gagal (limit/overload) coba yang berikutnya
     protected array $models = [
-        'gemini-3.8-flash',
-        'gemini-flash-lite-latest',
-        'gemini-2.5-flash-lite',
+        'gemini-3.5-flash',
+        'gemini-3.5-flash-lite',
+        'gemini-2.5-flash',
     ];
 
     public function chat(User $user, string $userMessage, array $history = []): string
