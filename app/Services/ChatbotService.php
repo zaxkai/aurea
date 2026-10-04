@@ -50,7 +50,7 @@ class ChatbotService
         foreach ($this->models as $model) {
             try {
                 $response = Http::timeout(30)
-                    ->withHeaders(['x-goog-api-key' => env('GEMINI_API_KEY')])
+                    ->withHeaders(['x-goog-api-key' => config('services.gemini.key')])
                     ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", [
                         'system_instruction' => ['parts' => [['text' => $this->getSystemPrompt($userMessage)]]],
                         'contents' => $contents,
@@ -120,7 +120,7 @@ class ChatbotService
             'summary' => Str::limit(trim($journalContent), 220),
             'advice' => 'Coba beri dirimu waktu sejenak untuk memahami perasaan ini. Kamu tidak harus menyelesaikan semuanya sekaligus.',
         ];
-        $apiKey = env('GEMINI_API_KEY');
+        $apiKey = config('services.gemini.key');
 
         if (! $apiKey) {
             return $fallback;
