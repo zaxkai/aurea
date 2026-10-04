@@ -29,7 +29,9 @@
                 <line x1="48" y1="42" x2="741" y2="42" stroke="#eef1f7" stroke-width="1" />
 
                 @foreach ($chartPoints as $index => $point)
-                    @php($nextPoint = $chartPoints[$index + 1] ?? null)
+                    @php
+                        $nextPoint = $chartPoints[$index + 1] ?? null;
+                    @endphp
                     @if ($point['mood'] && $nextPoint && $nextPoint['mood'])
                         <line x1="{{ $point['x'] }}" y1="{{ $point['y'] }}" x2="{{ $nextPoint['x'] }}" y2="{{ $nextPoint['y'] }}" stroke="{{ $nextPoint['color'] }}" stroke-width="3" stroke-linecap="round" />
                     @endif
@@ -47,30 +49,75 @@
         </div>
     </section>
 
-    <section aria-labelledby="journals-written-title" class="space-y-2.5">
-        <h2 id="journals-written-title" class="text-base font-semibold text-navy">Journals Written</h2>
+    <section aria-labelledby="journals-written-title" class="space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <h2 id="journals-written-title" class="text-base font-semibold text-navy">Journals Written</h2>
+                <p class="text-xs text-gray-400">Read and reflect on what you've created</p>
+            </div>
+
+            <!-- Inline Journal Search Input -->
+            <div class="relative w-full sm:w-72">
+                <svg class="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input type="text"
+                       wire:model.live.debounce.250ms="search"
+                       placeholder="Filter your notes..."
+                       class="w-full bg-white border border-gray-100 rounded-xl py-2 pl-9 pr-8 text-xs text-navy placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-aurea/30 shadow-sm" />
+                @if ($search !== '')
+                    <button type="button" wire:click="clearSearch" aria-label="Clear journal search" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-navy">
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                @endif
+            </div>
+        </div>
+
+        @if ($search !== '')
+            <div class="flex items-center justify-between rounded-xl bg-teal-50/70 border border-teal-100 px-3.5 py-2 text-xs text-teal-800">
+                <span>Showing results for "<strong>{{ $search }}</strong>" ({{ $journals->count() }} found)</span>
+                <button type="button" wire:click="clearSearch" class="font-semibold underline hover:text-navy">Show all</button>
+            </div>
+        @endif
 
         @if (session('journal-saved'))
             <p role="status" class="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">{{ session('journal-saved') }}</p>
         @endif
 
         @forelse ($journals as $journal)
-            @php($moodData = $moods[$journal->mood] ?? $moods['neutral'])
-            <article wire:key="journal-{{ $journal->id }}" class="flex min-h-[88px] items-center justify-between gap-4 rounded-lg bg-white px-5 py-3.5 shadow-sm md:px-6">
-                <div class="min-w-0">
-                    <p class="text-[11px] font-medium text-slate-400">{{ ($journal->journal_date ?? $journal->created_at)->format('F j') }}</p>
+            @php
+                $moodData = $moods[$journal->mood] ?? $moods['neutral'];
+                $isHighlighted = ($highlightedJournalId === $journal->id);
+            @endphp
+            <article wire:key="journal-{{ $journal->id }}"
+                     class="flex min-h-[88px] items-center justify-between gap-4 rounded-xl bg-white px-5 py-3.5 shadow-sm md:px-6 transition-all {{ $isHighlighted ? 'ring-2 ring-aurea shadow-md bg-cyan-50/30' : 'border border-gray-100/60' }}">
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2">
+                        <p class="text-[11px] font-medium text-slate-400">{{ ($journal->journal_date ?? $journal->created_at)->format('F j, Y') }}</p>
+                        @if ($isHighlighted)
+                            <span class="rounded-full bg-aurea/30 text-navy px-2 py-0.5 text-[10px] font-bold">Selected from search</span>
+                        @endif
+                    </div>
                     <h3 class="mt-1 flex items-center gap-1.5 text-sm font-semibold text-navy">
                         <span class="h-3.5 w-1 shrink-0 rounded-full {{ $moodData['background'] }}" aria-hidden="true"></span>
                         <span class="truncate">{{ $journal->title }}</span>
                     </h3>
-                    <p class="mt-0.5 line-clamp-2 text-xs text-slate-500">“{{ \Illuminate\Support\Str::limit($journal->content, 150) }}”</p>
+                    <p class="mt-0.5 line-clamp-2 text-xs text-slate-500">“{{ \Illuminate\Support\Str::limit($journal->content, 180) }}”</p>
                 </div>
                 <img src="{{ asset('images/journal/'.$moodData['mascot']) }}" alt="{{ $moodData['label'] }} mood" class="h-16 w-16 shrink-0 object-contain" loading="lazy">
             </article>
         @empty
             <div class="rounded-lg bg-white px-5 py-8 text-center shadow-sm">
-                <p class="text-sm font-semibold text-navy">Your journal starts here</p>
-                <p class="mt-1 text-xs text-slate-500">Choose the plus button when you're ready to write.</p>
+                @if ($search !== '')
+                    <p class="text-sm font-semibold text-navy">No journal entries found</p>
+                    <p class="mt-1 text-xs text-slate-500">No notes matched your search query "{{ $search }}".</p>
+                    <button type="button" wire:click="clearSearch" class="mt-3 inline-flex items-center rounded-xl bg-navy px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-navy/90">
+                        View all journals
+                    </button>
+                @else
+                    <p class="text-sm font-semibold text-navy">Your journal starts here</p>
+                    <p class="mt-1 text-xs text-slate-500">Choose the plus button when you're ready to write.</p>
+                @endif
             </div>
         @endforelse
     </section>
@@ -117,7 +164,7 @@
             @if ($showSummaryModal)
                 <section role="dialog" aria-modal="true" aria-labelledby="journal-summary-title" class="my-auto w-full max-w-[430px] rounded-[20px] border border-slate-200 bg-[#f5f7fc] p-5 shadow-2xl sm:p-7">
                     <div class="mb-4 flex items-start justify-between gap-4">
-                        <h2 id="journal-summary-title" class="max-w-[310px] text-2xl font-bold leading-tight text-navy">Here's what I understood from your journal <span class="inline-block h-5 w-5 align-middle"><img src="{{ asset('images/journal/maskot-journal1.png') }}" alt="" class="h-full w-full object-contain"></span></h2>
+                        <h2 id="journal-summary-title" class="max-w-[310px] text-2xl font-bold leading-tight text-navy">Here's what I understood from your journal <span class="inline-block h-5 w-5 align-middle"><img src="{{ asset('images/journal/maskot-journal2.png') }}" alt="" class="h-full w-full object-contain"></span></h2>
                         <button type="button" wire:click="closeModals" aria-label="Close" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-slate-200 text-navy transition hover:bg-slate-300">
                             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
                         </button>

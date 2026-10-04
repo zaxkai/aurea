@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('habit_logs', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('habit_id')->constrained()->cascadeOnDelete();
-        $table->date('log_date');
-        $table->unsignedInteger('value_logged')->default(0);
-        $table->timestamps();
+            $table->id();
+            $table->foreignId('habit_id')->constrained()->cascadeOnDelete();
+            $table->date('log_date');
+            $table->unsignedInteger('value_logged')->default(0);
+            $table->timestamps();
 
-        $table->unique(['habit_id', 'log_date']);
-    });
+            $table->unique(['habit_id', 'log_date']);
+        });
     }
 
     /**

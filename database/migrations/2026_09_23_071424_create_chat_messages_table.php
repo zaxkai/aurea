@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('chat_messages', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('chat_session_id')->constrained()->cascadeOnDelete();
-        $table->enum('role', ['user', 'assistant']);
-        $table->text('content');   // di-cast encrypted di model
-        $table->timestamps();
-    });
+        Schema::create('chat_messages', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('chat_session_id')->constrained()->cascadeOnDelete();
+            $table->enum('role', ['user', 'assistant']);
+            $table->text('content');   // di-cast encrypted di model
+            $table->timestamps();
+        });
     }
 
     /**

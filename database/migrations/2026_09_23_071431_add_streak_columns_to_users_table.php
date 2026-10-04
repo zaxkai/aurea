@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-        $table->unsignedInteger('current_streak')->default(0);
-        $table->unsignedInteger('longest_streak')->default(0);
-        $table->date('last_check_in_date')->nullable();
+            $table->unsignedInteger('current_streak')->default(0);
+            $table->unsignedInteger('longest_streak')->default(0);
+            $table->date('last_check_in_date')->nullable();
         });
     }
 
@@ -24,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn(['current_streak', 'longest_streak', 'last_check_in_date']);
-     });
+            $table->dropColumn(['current_streak', 'longest_streak', 'last_check_in_date']);
+        });
     }
 };

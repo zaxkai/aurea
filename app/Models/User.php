@@ -41,8 +41,25 @@ class User extends Authenticatable
     protected function name(): Attribute
     {
         return Attribute::make(
-            get: fn () => trim($this->first_name.' '.$this->last_name) ?: ($this->attributes['name'] ?? ''),
-            set: fn ($value) => ['name' => $value]
+            get: fn () => trim(($this->first_name ?? '').' '.($this->last_name ?? '')) ?: ($this->attributes['name'] ?? ''),
+            set: function ($value) {
+                $parts = explode(' ', trim($value), 2);
+
+                return [
+                    'name' => $value,
+                    'first_name' => $parts[0] ?? null,
+                    'last_name' => $parts[1] ?? null,
+                ];
+            }
+        );
+    }
+
+    protected function avatarUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->avatar
+                ? asset('storage/'.$this->avatar)
+                : 'https://ui-avatars.com/api/?name='.urlencode($this->name ?: 'G').'&color=2EE0E0&background=000F2E',
         );
     }
 

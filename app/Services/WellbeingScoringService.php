@@ -24,9 +24,10 @@ class WellbeingScoringService
         $screenTimeScore = $this->calculateScreenTimeScore($checkIn->screen_time_duration ?? 0);
 
         // Weighted Average Calculation
-        $finalIndex = ($who5Score * 0.40) +
-                      ($sleepScore * 0.20) +
-                      ($activityScore * 0.20) +
+        // Adjusted: WHO-5 (25%), Sleep (30%), Activity (25%), Screen Time (20%)
+        $finalIndex = ($who5Score * 0.25) +
+                      ($sleepScore * 0.30) +
+                      ($activityScore * 0.25) +
                       ($screenTimeScore * 0.20);
 
         return (int) round($finalIndex);
@@ -40,27 +41,33 @@ class WellbeingScoringService
         $insights = [];
         $recommendations = [];
 
+        $index = $this->calculateIndex($checkIn);
+
+        if ($index < 70) {
+            $insights[] = __('Overall, your daily habit indicators (sleep, activity, screen time) are currently not optimal.');
+        }
+
         // Sleep pattern detection
         if ($checkIn->sleep_duration < 7) {
-            $insights[] = 'Durasi tidurmu kurang dari batas ideal untuk usiamu.';
-            $recommendations[] = 'Cobalah untuk tidur lebih awal agar mencapai 8 jam istirahat.';
+            $insights[] = __('Your sleep duration is below the ideal limit for your age.');
+            $recommendations[] = __('Try to sleep earlier to achieve 8 hours of rest.');
         }
 
         // Screen time vs Sleep correlation logic
         if ($checkIn->screen_time_duration > 5 && $checkIn->sleep_duration < 7) {
-            $insights[] = 'Tingginya screen time tampaknya memengaruhi durasi tidurmu belakangan ini.';
-            $recommendations[] = 'Kurangi penggunaan gadget setidaknya 1 jam sebelum tidur.';
+            $insights[] = __('High screen time seems to be affecting your sleep duration lately.');
+            $recommendations[] = __('Reduce gadget usage at least 1 hour before bed.');
         }
 
         // Activity logic
         if ($checkIn->physical_activity_duration < 30) {
-            $insights[] = 'Aktivitas fisikmu tergolong rendah hari ini.';
-            $recommendations[] = 'Sempatkan jalan santai atau peregangan ringan selama 15-30 menit besok.';
+            $insights[] = __('Your physical activity is considered low today.');
+            $recommendations[] = __('Take time for a light walk or stretching for 15-30 minutes tomorrow.');
         }
 
         if (empty($insights)) {
-            $insights[] = 'Pola harianmu terlihat sangat seimbang. Pertahankan!';
-            $recommendations[] = 'Lanjutkan rutinitas baikmu dan pastikan tetap terhidrasi.';
+            $insights[] = __('Your daily pattern looks very balanced (seimbang). Keep it up!');
+            $recommendations[] = __('Continue your good routine and make sure to stay hydrated.');
         }
 
         return [

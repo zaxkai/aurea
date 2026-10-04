@@ -1,6 +1,6 @@
 @props(['active' => 'home'])
 
-<aside class="fixed inset-x-0 bottom-0 z-40 flex h-[72px] w-full items-center justify-between border-t border-gray-100 bg-white px-1 md:static md:h-dvh md:min-h-screen md:w-[180px] md:flex-col md:items-stretch md:border-r md:border-t-0 md:p-3">
+<aside class="fixed inset-x-0 bottom-0 z-40 flex h-[72px] w-full items-center justify-between border-t border-gray-100 bg-white px-1 md:static md:h-dvh md:min-h-0 md:w-[180px] md:flex-col md:items-stretch md:border-r md:border-t-0 md:p-3">
     <div class="flex min-w-0 flex-1 items-center md:block">
         <!-- Logo -->
         <a href="{{ route('dashboard') }}" class="mb-10 hidden items-center gap-2.5 px-2 group md:flex">

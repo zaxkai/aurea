@@ -10,6 +10,18 @@ use Illuminate\Support\Str;
 
 class ChatbotService
 {
+    private const array ENGLISH_LANGUAGE_CUES = [
+        'am', 'because', 'but', 'feel', 'for', 'have', 'hello', 'i', 'is',
+        'me', 'my', 'school', 'so', 'teacher', 'the', 'this', 'tired', 'to',
+        'was', 'with', 'you', 'your',
+    ];
+
+    private const array INDONESIAN_LANGUAGE_CUES = [
+        'aku', 'anda', 'banget', 'belum', 'cerita', 'dan', 'dengan', 'di',
+        'guru', 'ini', 'itu', 'kamu', 'karena', 'lagi', 'lelah', 'mau',
+        'merasa', 'nggak', 'saya', 'sih', 'tidak', 'untuk', 'yang',
+    ];
+
     // Coba model utama dulu, kalau gagal (limit/overload) coba yang berikutnya
     protected array $models = [
         'gemini-3.8-flash',
@@ -40,7 +52,7 @@ class ChatbotService
                 $response = Http::timeout(30)
                     ->withHeaders(['x-goog-api-key' => env('GEMINI_API_KEY')])
                     ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", [
-                        'system_instruction' => ['parts' => [['text' => $this->getSystemPrompt()]]],
+                        'system_instruction' => ['parts' => [['text' => $this->getSystemPrompt($userMessage)]]],
                         'contents' => $contents,
                         'generationConfig' => ['temperature' => 0.7, 'maxOutputTokens' => 500],
                     ]);
@@ -121,7 +133,7 @@ class ChatbotService
                 $response = Http::timeout(30)
                     ->withHeaders(['x-goog-api-key' => $apiKey])
                     ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", [
-                        'system_instruction' => ['parts' => [['text' => 'Kamu adalah Aurea, pendamping journaling yang hangat untuk remaja Indonesia. Jaga privasi, jangan mendiagnosis atau menyarankan obat. Jika catatan mengandung risiko menyakiti diri, sarankan menghubungi orang dewasa tepercaya atau bantuan darurat.']]],
+                        'system_instruction' => ['parts' => [['text' => 'Kamu adalah Aurea, pendamping journaling yang hangat untuk remaja. Gunakan bahasa utama yang sama dengan isi catatan jurnal untuk summary dan advice; abaikan bahasa instruksi, label mood, dan properti JSON. Jaga privasi, jangan mendiagnosis atau menyarankan obat. Jika catatan mengandung risiko menyakiti diri, sarankan menghubungi orang dewasa tepercaya atau bantuan darurat.']]],
                         'contents' => [['role' => 'user', 'parts' => [['text' => $prompt]]]],
                         'generationConfig' => [
                             'temperature' => 0.4,
@@ -150,16 +162,45 @@ class ChatbotService
         return $fallback;
     }
 
-    protected function getSystemPrompt(): string
+    protected function getSystemPrompt(string $latestUserMessage): string
     {
-        return <<<'PROMPT'
-Kamu adalah Aurea, teman ngobrol AI untuk remaja Indonesia yang lagi menghadapi stres atau masalah emosi.
-Gaya: hangat, tidak menghakimi, bahasa santai tapi sopan.
-Aturan:
-- Jangan mendiagnosis dan jangan menyarankan obat.
-- Dengarkan dulu, validasi perasaan, ajukan satu pertanyaan terbuka.
-- Sarankan coping sederhana (napas, journaling, cerita ke orang tepercaya).
-- Kalau user menyebut ingin menyakiti diri atau mengakhiri hidup, tanggapi dengan tenang dan peduli, dorong dia menghubungi orang dewasa tepercaya atau layanan darurat/profesional, dan jangan lanjut ke topik lain.
+        $responseLanguage = $this->detectResponseLanguage($latestUserMessage);
+        $languageInstruction = $responseLanguage
+            ? "REQUIRED RESPONSE LANGUAGE: {$responseLanguage}. Write your entire response only in {$responseLanguage}. Do not use another language."
+            : 'Reply entirely in the primary language used in the latest user message. Ignore the language of earlier conversation turns.';
+
+        $prompt = <<<'PROMPT'
+You are Aurea, a warm and supportive AI companion for teenagers dealing with stress or emotional difficulties.
+LANGUAGE — highest priority:
+- Reply entirely in the primary language used in the user's latest message.
+- Determine the language from the latest message alone. Ignore the language of this system prompt, earlier messages, and the user's profile or locale.
+- If the latest message is in English, reply in English. If it is in Indonesian, reply in Indonesian.
+- For a message mixing languages, reply in the language used most.
+STYLE: Be warm, nonjudgmental, casual, and respectful.
+SAFETY AND SUPPORT:
+- Do not diagnose or recommend medication.
+- Listen first, validate the user's feelings, and ask one open-ended question.
+- Suggest simple coping strategies such as breathing, journaling, or talking to someone they trust.
+- If the user mentions self-harm or suicide, respond calmly and compassionately, encourage them to contact a trusted adult or emergency/professional support, and do not change the subject.
 PROMPT;
+
+        return $languageInstruction."\n\n".$prompt;
+    }
+
+    private function detectResponseLanguage(string $message): ?string
+    {
+        $tokens = preg_split('/[^\p{L}]+/u', Str::lower($message), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $englishScore = count(array_intersect($tokens, self::ENGLISH_LANGUAGE_CUES));
+        $indonesianScore = count(array_intersect($tokens, self::INDONESIAN_LANGUAGE_CUES));
+
+        if ($englishScore > $indonesianScore) {
+            return 'English';
+        }
+
+        if ($indonesianScore > $englishScore) {
+            return 'Indonesian';
+        }
+
+        return null;
     }
 }

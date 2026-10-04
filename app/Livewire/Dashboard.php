@@ -79,7 +79,7 @@ class Dashboard extends Component
 
     public float $screenTimeDuration = 4.0;
 
-    public int $who5Score = 70;
+    public int $who5Score = 50;
 
     public ?CheckIn $todayCheckIn = null;
 
@@ -124,7 +124,7 @@ class Dashboard extends Component
             $this->sleepDuration = (float) ($this->todayCheckIn->sleep_duration ?? 7.5);
             $this->physicalActivityDuration = (int) ($this->todayCheckIn->physical_activity_duration ?? 45);
             $this->screenTimeDuration = (float) ($this->todayCheckIn->screen_time_duration ?? 4.0);
-            $this->who5Score = (int) ($this->todayCheckIn->who5_score ?? 70);
+            $this->who5Score = (int) ($this->todayCheckIn->who5_score ?? 50);
             $this->aiInsight = $this->todayCheckIn->ai_insight;
         }
     }

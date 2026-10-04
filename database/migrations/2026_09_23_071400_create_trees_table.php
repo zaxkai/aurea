@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('trees', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
-        $table->unsignedTinyInteger('growth_percentage')->default(0);
-        $table->timestamps();
-    });
+            $table->id();
+            $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
+            $table->unsignedTinyInteger('growth_percentage')->default(0);
+            $table->timestamps();
+        });
     }
 
     /**

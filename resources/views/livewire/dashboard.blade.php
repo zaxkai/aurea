@@ -11,7 +11,7 @@
                         Welcome, {{ explode(' ', auth()->user()->name)[0] }}
                     </h1>
                     <span class="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-sm font-bold text-navy shadow-sm border border-gray-100">
-                        <span class="text-aurea">💧</span>
+                        <img src="{{ asset('images/logo-api.png') }}" alt="" class="h-4 w-4 object-contain">
                         {{ auth()->user()->current_streak ?? 30 }}
                     </span>
                 </div>
@@ -50,7 +50,7 @@
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
-                            Input Check-in Lengkap (Tidur, Aktivitas, Screen Time)
+                            {{ __('Input Complete Check-in (Sleep, Activity, Screen Time)') }}
                         </button>
                     </div>
                 </div>
@@ -94,7 +94,7 @@
                     </div>
                     <button wire:click="openDetailedModal"
                             class="text-xs font-bold text-navy bg-white px-3.5 py-2 rounded-xl border border-gray-200 shadow-sm hover:bg-gray-50 transition shrink-0">
-                        Update Data
+                        {{ __('Update Data') }}
                     </button>
                 </div>
             @endif
@@ -144,13 +144,13 @@
                                 </div>
                             @empty
                                 <div class="text-center py-4 text-xs text-gray-400">
-                                    Belum ada checklist harian.
+                                    {{ __('No daily checklist yet.') }}
                                 </div>
                             @endforelse
                         </div>
                     </div>
 
-                    <p class="mt-4 text-center text-[11px] font-medium text-gray-400">Disusun dari profilmu</p>
+                    <p class="mt-4 text-center text-[11px] font-medium text-gray-400">{{ __('Curated from your profile') }}</p>
                 </div>
 
                 <!-- Habit Tracker (White Card) -->
@@ -158,16 +158,16 @@
                     <div>
                         <div class="mb-5 flex items-center justify-between gap-3">
                             <div>
-                                <h3 class="font-bold text-base text-navy">Pelacak Habit</h3>
+                                <h3 class="font-bold text-base text-navy">{{ __('Habit Tracker') }}</h3>
                                 <p class="mt-0.5 text-[11px] text-gray-400">
                                     @if ($isPremium)
-                                        Tanpa batas
+                                        Unlimited <span class="sr-only">Tanpa batas</span>
                                     @else
-                                        {{ $activeHabitCount }}/{{ $freeHabitLimit }} habit
+                                        {{ $activeHabitCount }}/{{ $freeHabitLimit }} habits
                                     @endif
                                 </p>
                             </div>
-                            <button type="button" wire:click="openAddHabitModal" title="Tambah habit" aria-label="Tambah habit" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy text-white transition hover:bg-navy/90 focus:outline-none focus:ring-2 focus:ring-aurea focus:ring-offset-2">
+                            <button type="button" wire:click="openAddHabitModal" title="{{ __('Add habit') }}" aria-label="{{ __('Add habit') }}" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy text-white transition hover:bg-navy/90 focus:outline-none focus:ring-2 focus:ring-aurea focus:ring-offset-2">
                                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-width="2" /></svg>
                             </button>
                         </div>
@@ -190,7 +190,7 @@
                                             <button type="button"
                                                     wire:click="toggleHabit({{ $habit->id }})"
                                                     class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all {{ $isFull ? 'bg-navy border-navy text-white' : 'border-gray-300 hover:border-navy' }}"
-                                                    title="Tambah progres">
+                                                    title="{{ __('Add progress') }}">
                                                 @if ($isFull)
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
@@ -200,7 +200,7 @@
                                                 @endif
                                             </button>
                                             @if ($habit->source === 'user')
-                                                <button type="button" wire:click="removeCustomHabit({{ $habit->id }})" title="Nonaktifkan habit" aria-label="Nonaktifkan {{ $habit->name }}" class="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-rose-50 hover:text-rose-600">
+                                                <button type="button" wire:click="removeCustomHabit({{ $habit->id }})" title="{{ __('Disable habit') }}" aria-label="{{ __('Disable') }} {{ $habit->name }}" class="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-rose-50 hover:text-rose-600">
                                                     <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M5 7l1 13h12l1-13M9 7V4h6v3" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" /></svg>
                                                 </button>
                                             @endif
@@ -212,7 +212,7 @@
                                 </div>
                             @empty
                                 <div class="text-center py-4 text-xs text-gray-400">
-                                    Belum ada habit progress yang aktif.
+                                    {{ __('No active habit progress yet.') }}
                                 </div>
                             @endforelse
                         </div>
@@ -228,7 +228,7 @@
                     <h3 class="font-bold text-base text-navy mb-2">Growth Tree Preview</h3>
 
                     <x-growth-tree :stage="$treeStage" compact />
-                    <p class="text-xs font-medium text-gray-500">{{ $completedGrowthItemsCount }} target selesai</p>
+                    <p class="text-xs font-medium text-gray-500">{{ $completedGrowthItemsCount }} {{ __('targets completed') }}</p>
 
                     <a href="{{ route('habit-growth-tree') }}" class="mt-2 text-xs font-semibold text-gray-500 transition hover:text-navy">
                         See full

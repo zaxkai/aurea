@@ -8,8 +8,8 @@ class HabitLog extends Model
 {
     protected $fillable = ['habit_id', 'log_date', 'value_logged'];
 
-public function habit()
-{
-    return $this->belongsTo(Habit::class);
-}
+    public function habit()
+    {
+        return $this->belongsTo(Habit::class);
+    }
 }

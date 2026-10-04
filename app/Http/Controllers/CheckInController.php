@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\AppNotification;
 use App\Services\PatternDetectionService;
 use App\Services\WellbeingScoringService;
 use Illuminate\Http\RedirectResponse;
@@ -93,5 +94,14 @@ class CheckInController extends Controller
 
         $user->last_check_in_date = today();
         $user->save();
+
+        if (in_array($user->current_streak, [3, 7, 14, 30, 60, 100])) {
+            $user->notify(new AppNotification(
+                '🔥 '.$user->current_streak.' Days Streak!',
+                "You're on fire! You've checked in for {$user->current_streak} consecutive days.",
+                'fire',
+                'warning'
+            ));
+        }
     }
 }

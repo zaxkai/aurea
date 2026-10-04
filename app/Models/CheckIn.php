@@ -53,14 +53,14 @@ class CheckIn extends Model
         $index = $this->wellbeing_index;
 
         if ($index === null) {
-            return 'Belum dihitung';
+            return __('Not calculated');
         }
 
         return match (true) {
-            $index >= 80 => 'Sangat Baik',
-            $index >= 60 => 'Baik',
-            $index >= 40 => 'Perlu Perhatian',
-            default => 'Perlu Tindakan',
+            $index >= 85 => __('Excellent'),
+            $index >= 70 => __('Good'),
+            $index >= 55 => __('Needs Attention'),
+            default => __('Action Required'),
         };
     }
 }

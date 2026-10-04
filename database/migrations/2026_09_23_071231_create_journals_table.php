@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('journals', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-        $table->string('title');
-        $table->text('content');   // di-cast encrypted di model
-        $table->enum('mood', ['energetic', 'calm', 'neutral', 'stressed', 'exhausted']);
-        $table->timestamps();
-    });
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('title');
+            $table->text('content');   // di-cast encrypted di model
+            $table->enum('mood', ['energetic', 'calm', 'neutral', 'stressed', 'exhausted']);
+            $table->timestamps();
+        });
     }
 
     /**

@@ -3,12 +3,20 @@
 namespace App\Livewire;
 
 use App\Models\Journal;
+use App\Notifications\AppNotification;
 use App\Services\ChatbotService;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class JournalPage extends Component
 {
+    #[Url]
+    public string $search = '';
+
+    #[Url]
+    public ?int $highlight = null;
+
     public bool $showWriteModal = false;
 
     public bool $showSummaryModal = false;
@@ -33,11 +41,11 @@ class JournalPage extends Component
         ],
         'calm' => [
             'label' => 'Calm',
-            'emoji' => '☺',
+            'emoji' => '😌',
             'background' => 'bg-mood-calm',
             'color' => '#ed62e8',
             'score' => 2,
-            'mascot' => 'maskot-journal4.png',
+            'mascot' => 'maskot-journal3.png',
             'title' => 'Balanced day',
         ],
         'neutral' => [
@@ -46,7 +54,7 @@ class JournalPage extends Component
             'background' => 'bg-mood-neutral',
             'color' => '#31dfa0',
             'score' => 3,
-            'mascot' => 'maskot-journal1.png',
+            'mascot' => 'maskot-journal3.png',
             'title' => 'A quiet reflection',
         ],
         'stressed' => [
@@ -55,7 +63,7 @@ class JournalPage extends Component
             'background' => 'bg-mood-stressed',
             'color' => '#ff3e9a',
             'score' => 4,
-            'mascot' => 'maskot-journal3.png',
+            'mascot' => 'maskot-journal1.png',
             'title' => 'Stressed mind',
         ],
         'exhausted' => [
@@ -121,6 +129,8 @@ class JournalPage extends Component
             return;
         }
 
+        $isFirstJournal = auth()->user()->journals()->count() === 0;
+
         auth()->user()->journals()->create([
             'title' => $this->moods[$validated['mood']]['title'],
             'content' => trim($validated['content']),
@@ -129,6 +139,15 @@ class JournalPage extends Component
             'advice' => $this->advice,
             'journal_date' => today(),
         ]);
+
+        if ($isFirstJournal) {
+            auth()->user()->notify(new AppNotification(
+                '⭐ First Journal!',
+                'You wrote your first journal. Keep nurturing your mind.',
+                'star',
+                'success'
+            ));
+        }
 
         $this->closeModals();
         $this->mood = 'neutral';
@@ -139,14 +158,20 @@ class JournalPage extends Component
         session()->flash('journal-saved', 'Your journal has been saved.');
     }
 
+    public function clearSearch(): void
+    {
+        $this->search = '';
+        $this->highlight = null;
+    }
+
     public function render(): View
     {
-        $journals = auth()->user()->journals()
+        $allJournals = auth()->user()->journals()
             ->latest('created_at')
-            ->limit(20)
+            ->limit(50)
             ->get();
 
-        $journalsByDate = $journals->groupBy(fn (Journal $journal): string => ($journal->journal_date ?? $journal->created_at)->toDateString()
+        $journalsByDate = $allJournals->groupBy(fn (Journal $journal): string => ($journal->journal_date ?? $journal->created_at)->toDateString()
         )->map(fn ($entries) => $entries->first());
 
         $chartPoints = collect(range(9, 0))
@@ -166,9 +191,23 @@ class JournalPage extends Component
             })
             ->all();
 
+        $filteredJournals = $allJournals;
+        if (filled(trim($this->search))) {
+            $term = mb_strtolower(trim($this->search));
+            $filteredJournals = $allJournals->filter(function (Journal $journal) use ($term): bool {
+                return str_contains(mb_strtolower((string) $journal->title), $term)
+                    || str_contains(mb_strtolower((string) $journal->content), $term)
+                    || str_contains(mb_strtolower((string) $journal->summary), $term)
+                    || str_contains(mb_strtolower((string) $journal->advice), $term)
+                    || str_contains(mb_strtolower((string) $journal->mood), $term)
+                    || ($journal->journal_date && str_contains(mb_strtolower($journal->journal_date->format('M j Y F d')), $term));
+            });
+        }
+
         return view('livewire.journal-page', [
-            'journals' => $journals,
+            'journals' => $filteredJournals,
             'chartPoints' => $chartPoints,
+            'highlightedJournalId' => $this->highlight,
         ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\AppNotification;
 use Illuminate\Database\Eloquent\Model;
 
 class Tree extends Model
@@ -61,10 +62,24 @@ class Tree extends Model
         })->count();
         $completedTasks = $tasks->where('is_done', true)->count();
 
+        $oldPercentage = $this->growth_percentage;
         $this->growth_percentage = (int) round((($completedHabits + $completedTasks) / $totalItems) * 100);
 
         if ($this->isDirty('growth_percentage')) {
             $this->save();
+
+            $oldStage = self::growthStageForCompletedItems((int) round(($oldPercentage / 100) * $totalItems));
+            $newStage = self::growthStageForCompletedItems((int) round(($this->growth_percentage / 100) * $totalItems));
+
+            if ($newStage > $oldStage) {
+                $this->user->notify(new AppNotification(
+                    '🌳 Tree Leveled Up!',
+                    'Your Habit Growth Tree just reached a new stage. Keep it up!',
+                    'tree',
+                    'success',
+                    '/habit-growth-tree'
+                ));
+            }
         }
     }
 }

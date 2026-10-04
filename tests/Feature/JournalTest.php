@@ -4,7 +4,30 @@ use App\Livewire\JournalPage;
 use App\Models\Journal;
 use App\Models\User;
 use App\Services\ChatbotService;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
+
+it('instructs Gemini to summarize a journal in the language of its content', function () {
+    $requestData = null;
+    Http::preventStrayRequests();
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => function (Request $request) use (&$requestData) {
+            $requestData = $request->data();
+
+            return Http::response([
+                'candidates' => [['content' => ['parts' => [['text' => '{"summary":"A difficult day.","advice":"Take a short break."}']]]]],
+            ]);
+        },
+    ]);
+
+    app(ChatbotService::class)->summarizeJournal('I had a difficult day.', 'stressed');
+
+    expect($requestData['system_instruction']['parts'][0]['text'])
+        ->toContain('bahasa utama yang sama dengan isi catatan jurnal')
+        ->and($requestData['contents'][0]['parts'][0]['text'])
+        ->toContain('I had a difficult day.');
+});
 
 it('shows only the authenticated users journal entries', function () {
     $user = User::factory()->create();

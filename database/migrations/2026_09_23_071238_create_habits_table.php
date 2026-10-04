@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('habits', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-        $table->string('name');              // "Drink 2L of water"
-        $table->string('unit')->nullable();  // "ML", "Steps"
-        $table->unsignedInteger('target_value');
-        $table->boolean('is_active')->default(true);
-        $table->timestamps();
-    });
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('name');              // "Drink 2L of water"
+            $table->string('unit')->nullable();  // "ML", "Steps"
+            $table->unsignedInteger('target_value');
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
     }
 
     /**

@@ -12,15 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mental_profiles', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
-        $table->text('symptoms')->nullable();       // akan di-cast encrypted di model
-        $table->text('anxiety_triggers')->nullable();
-        $table->text('bad_experiences')->nullable();
-        $table->json('focus_areas')->nullable();     // contoh: ["School", "Friendships"]
-        $table->timestamp('completed_at')->nullable();
-        $table->timestamps();
-    });
+            $table->id();
+            $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
+            $table->text('symptoms')->nullable();       // akan di-cast encrypted di model
+            $table->text('anxiety_triggers')->nullable();
+            $table->text('bad_experiences')->nullable();
+            $table->json('focus_areas')->nullable();     // contoh: ["School", "Friendships"]
+            $table->timestamp('completed_at')->nullable();
+            $table->timestamps();
+        });
     }
 
     /**

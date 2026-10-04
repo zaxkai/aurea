@@ -3,6 +3,8 @@
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\PremiumController;
 use App\Models\Tree;
+use App\Notifications\AppNotification;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -56,3 +58,41 @@ Route::post('check-in', [CheckInController::class, 'store'])
     ->name('checkin.store');
 
 require __DIR__.'/auth.php';
+
+Route::get('/seed-notifications', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+
+        $user = auth()->user();
+        if ($user) {
+            $user->notify(new AppNotification(
+                'Welcome to Premium!',
+                'You now have unlimited habits and priority AI responses. Keep growing!',
+                'star',
+                'success',
+                '/premium'
+            ));
+
+            $user->notify(new AppNotification(
+                '🔥 3 Days Streak!',
+                'You are on fire! Keep the momentum going.',
+                'fire',
+                'warning'
+            ));
+
+            $user->notify(new AppNotification(
+                'Your Tree is Growing',
+                'Your Habit Growth Tree just leveled up. Check it out!',
+                'tree',
+                'info',
+                '/habit-growth-tree'
+            ));
+
+            return 'Notifications seeded and migrated successfully! <a href="/dashboard">Go back</a>';
+        }
+
+        return 'Please log in first.';
+    } catch (Exception $e) {
+        return 'Error: '.$e->getMessage();
+    }
+});

@@ -33,6 +33,57 @@ it('saves a user message and the assistant reply to the chat session', function 
         ->and($user->aiUsageLogs()->count())->toBe(1);
 });
 
+it('instructs Gemini to reply in the language of the latest chat message', function () {
+    $user = User::factory()->create();
+    $requestData = null;
+    Http::preventStrayRequests();
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => function (Request $request) use (&$requestData) {
+            $requestData = $request->data();
+
+            return Http::response([
+                'candidates' => [['content' => ['parts' => [['text' => 'I am here with you.']]]]],
+            ]);
+        },
+    ]);
+
+    app(ChatbotService::class)->chat($user, 'school because my teacher send a lot home work', [
+        ['role' => 'user', 'content' => 'Aku sedang merasa sedih.'],
+    ]);
+
+    expect($requestData['system_instruction']['parts'][0]['text'])
+        ->toContain('REQUIRED RESPONSE LANGUAGE: English')
+        ->toContain('Write your entire response only in English')
+        ->toContain('Ignore the language of this system prompt, earlier messages')
+        ->and($requestData['contents'][1]['parts'][0]['text'])
+        ->toBe('school because my teacher send a lot home work');
+});
+
+it('keeps Indonesian replies when the latest chat message is Indonesian', function () {
+    $user = User::factory()->create();
+    $requestData = null;
+    Http::preventStrayRequests();
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => function (Request $request) use (&$requestData) {
+            $requestData = $request->data();
+
+            return Http::response([
+                'candidates' => [['content' => ['parts' => [['text' => 'Aku mendengarkan.']]]]],
+            ]);
+        },
+    ]);
+
+    app(ChatbotService::class)->chat($user, 'Aku lagi merasa capek banget', [
+        ['role' => 'user', 'content' => 'I had a long day at school.'],
+    ]);
+
+    expect($requestData['system_instruction']['parts'][0]['text'])
+        ->toContain('REQUIRED RESPONSE LANGUAGE: Indonesian')
+        ->toContain('Write your entire response only in Indonesian')
+        ->and($requestData['contents'][1]['parts'][0]['text'])
+        ->toBe('Aku lagi merasa capek banget');
+});
+
 it('automatically processes a quick note forwarded from the dashboard', function () {
     $user = User::factory()->create();
     Http::preventStrayRequests();

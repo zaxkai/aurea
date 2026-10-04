@@ -21,7 +21,7 @@ class PatternDetectionService
 
         if ($checkIns->count() < 3) {
             return [
-                'patterns' => ['Belum cukup data untuk mendeteksi pola. Lanjutkan check-in harianmu!'],
+                'patterns' => [__('Not enough data to detect a multi-day pattern. Keep checking in daily!')],
                 'warning_level' => 'none',
                 'trends' => [],
             ];
@@ -37,35 +37,41 @@ class PatternDetectionService
 
         // Pattern: Sleep declining + Screen time increasing
         if ($trends['sleep'] === 'declining' && $trends['screen_time'] === 'increasing') {
-            $patterns[] = 'Durasi tidurmu menurun bersamaan dengan peningkatan screen time dalam beberapa hari terakhir.';
+            $patterns[] = __('Your sleep duration is decreasing while your screen time is increasing.');
         }
 
         // Pattern: Low activity + declining wellbeing
         if ($trends['activity'] === 'declining' && $trends['wellbeing'] === 'declining') {
-            $patterns[] = 'Aktivitas fisikmu berkurang dan well-being index-mu juga menurun. Keduanya mungkin saling berkaitan.';
+            $patterns[] = __('Your physical activity is dropping along with your overall well-being. These might be connected.');
         }
 
         // Pattern: Sleep declining + Wellbeing declining
         if ($trends['sleep'] === 'declining' && $trends['wellbeing'] === 'declining') {
-            $patterns[] = 'Pola tidur yang menurun tampak berkorelasi dengan penurunan well-being index-mu.';
+            $patterns[] = __('Your declining sleep pattern seems to correlate with a drop in your well-being index.');
         }
 
         // Pattern: Consistent stressed/exhausted mood
         $recentMoods = $checkIns->pluck('mood')->toArray();
         $negativeMoodCount = count(array_filter($recentMoods, fn (string $m) => in_array($m, ['stressed', 'exhausted'])));
         if ($negativeMoodCount >= ceil($checkIns->count() * 0.6)) {
-            $patterns[] = 'Mood-mu cenderung berada di zona stressed/exhausted secara konsisten. Pertimbangkan untuk berbicara dengan seseorang yang kamu percaya.';
+            $patterns[] = __('You have been consistently feeling stressed or exhausted. Please consider talking to someone you trust.');
         }
 
         // Pattern: Everything improving
         if ($trends['sleep'] === 'improving' && $trends['wellbeing'] === 'improving') {
-            $patterns[] = 'Pola tidur dan well-being-mu menunjukkan peningkatan. Kerja bagus!';
+            $patterns[] = __('Your sleep patterns and well-being are both showing signs of improvement. Great job!');
         }
 
         $warningLevel = $this->determineWarningLevel($trends, $patterns);
 
         if (empty($patterns)) {
-            $patterns[] = 'Pola harianmu terlihat stabil. Tetap jaga konsistensimu!';
+            // Only congratulate if the average wellbeing is good. Otherwise, just state it's stable.
+            $avgWellbeing = $checkIns->pluck('wellbeing_index')->filter()->average() ?? 0;
+            if ($avgWellbeing >= 70) {
+                $patterns[] = __('Your daily patterns look stable and healthy. Keep up the consistency!');
+            } else {
+                $patterns[] = __('Your daily patterns have been stable, but there is room for improvement in your habits.');
+            }
         }
 
         return [
