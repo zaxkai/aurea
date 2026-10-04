@@ -110,7 +110,7 @@ it('returns insufficient data message when fewer than 3 check-ins exist', functi
     $result = $service->analyze($user);
 
     expect($result['warning_level'])->toBe('none')
-        ->and($result['patterns'][0])->toContain('Belum cukup data');
+        ->and($result['patterns'][0])->toContain(__('Not enough data to detect a multi-day pattern. Keep checking in daily!'));
 });
 
 it('stores a check-in and calculates wellbeing index via controller', function () {

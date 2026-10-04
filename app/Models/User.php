@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['first_name', 'last_name', 'name', 'email', 'password', 'google_id', 'avatar', 'current_streak', 'longest_streak', 'last_active_date', 'onboarding_completed_at'])]
+#[Fillable(['first_name', 'last_name', 'name', 'email', 'password', 'google_id', 'avatar', 'current_streak', 'longest_streak', 'last_active_date', 'onboarding_completed_at', 'role'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -117,6 +118,28 @@ class User extends Authenticatable
     public function onboardingAnswers()
     {
         return $this->hasMany(OnboardingAnswer::class);
+    }
+
+    public function taughtClassrooms(): HasMany
+    {
+        return $this->hasMany(Classroom::class, 'teacher_id');
+    }
+
+    public function enrolledClassrooms(): BelongsToMany
+    {
+        return $this->belongsToMany(Classroom::class, 'classroom_student', 'student_id', 'classroom_id')
+            ->withPivot('joined_at')
+            ->withTimestamps();
+    }
+
+    public function isTeacher(): bool
+    {
+        return $this->role === 'teacher';
+    }
+
+    public function isStudent(): bool
+    {
+        return $this->role !== 'teacher';
     }
 
     public function isPremium(): bool

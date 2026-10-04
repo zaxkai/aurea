@@ -28,6 +28,7 @@
             'journal' => 'journal',
             'habit-growth-tree' => 'tree',
             'ai-aurea' => 'ai',
+            'teacher.students' => 'teacher-students',
             default => request()->segment(1) ?? 'home',
         }" />
 
@@ -50,7 +51,7 @@
                     <a href="{{ route('profile') }}" class="flex items-center gap-2 border-l border-gray-200 pl-3 sm:gap-3 sm:pl-6 group">
                         <div class="hidden text-right sm:block">
                             <div class="text-sm font-bold text-navy group-hover:text-aurea transition-colors">{{ auth()->user()->name ?? 'Guest' }}</div>
-                            <div class="text-xs text-gray-500 font-medium">Student</div>
+                            <div class="text-xs text-gray-500 font-medium">{{ auth()->user()->isTeacher() ? 'Teacher' : 'Student' }}</div>
                         </div>
                         <img src="{{ auth()->user()->avatar_url }}" alt="Avatar" class="w-10 h-10 rounded-full shadow-sm ring-2 ring-transparent group-hover:ring-aurea transition-all">
                     </a>

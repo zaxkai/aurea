@@ -18,6 +18,8 @@ new #[Layout('layouts.guest')] class extends Component
 
     public string $password = '';
 
+    public string $role = 'student';
+
     /**
      * Handle an incoming registration request.
      */
@@ -28,16 +30,25 @@ new #[Layout('layouts.guest')] class extends Component
             'last_name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'string', Rules\Password::defaults()],
+            'role' => ['required', 'in:student,teacher'],
         ]);
 
         $validated['name'] = trim($this->first_name.' '.$this->last_name);
         $validated['password'] = Hash::make($validated['password']);
 
+        if ($validated['role'] === 'teacher') {
+            $validated['onboarding_completed_at'] = now();
+        }
+
         event(new Registered($user = User::create($validated)));
 
         Auth::login($user);
 
-        $this->redirect(route('profile-setup', absolute: false), navigate: true);
+        if ($user->isTeacher()) {
+            $this->redirect(route('dashboard', absolute: false), navigate: true);
+        } else {
+            $this->redirect(route('profile-setup', absolute: false), navigate: true);
+        }
     }
 }; ?>
 
@@ -47,6 +58,24 @@ new #[Layout('layouts.guest')] class extends Component
     </div>
 
     <form wire:submit="register">
+        <!-- Account Role Selection -->
+        <div class="mb-4">
+            <label class="block font-medium text-xs text-gray-500 mb-1.5">I am registering as</label>
+            <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl">
+                <button type="button" 
+                        wire:click="$set('role', 'student')"
+                        class="py-2 text-xs font-semibold rounded-lg transition-all {{ $role === 'student' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900' }}">
+                    🌱 Student / Teen
+                </button>
+                <button type="button" 
+                        wire:click="$set('role', 'teacher')"
+                        class="py-2 text-xs font-semibold rounded-lg transition-all {{ $role === 'teacher' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900' }}">
+                    👨‍🏫 Teacher / Educator
+                </button>
+            </div>
+            @error('role') <span class="text-xs text-red-600 mt-1">{{ $message }}</span> @enderror
+        </div>
+
         <div class="flex gap-4">
             <!-- First Name -->
             <div class="w-1/2">

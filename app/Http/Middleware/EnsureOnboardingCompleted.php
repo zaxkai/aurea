@@ -15,7 +15,7 @@ class EnsureOnboardingCompleted
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user() && is_null($request->user()->onboarding_completed_at)) {
+        if ($request->user() && ! $request->user()->isTeacher() && is_null($request->user()->onboarding_completed_at)) {
             return redirect()->route('profile-setup');
         }
 

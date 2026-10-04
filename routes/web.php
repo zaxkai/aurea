@@ -18,6 +18,16 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified', 'onboarding'])
     ->name('dashboard');
 
+Route::get('teacher/students', function () {
+    if (! auth()->user()->isTeacher()) {
+        abort(403, 'Akses khusus guru.');
+    }
+
+    return view('teacher.students');
+})
+    ->middleware(['auth', 'verified', 'onboarding'])
+    ->name('teacher.students');
+
 Route::view('journal', 'journal')
     ->middleware(['auth', 'verified', 'onboarding'])
     ->name('journal');
