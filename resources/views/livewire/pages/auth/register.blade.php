@@ -44,6 +44,8 @@ new #[Layout('layouts.guest')] class extends Component
 
         Auth::login($user);
 
+        session()->regenerate();
+
         if ($user->isTeacher()) {
             $this->redirect(route('dashboard', absolute: false), navigate: true);
         } else {
@@ -58,6 +60,7 @@ new #[Layout('layouts.guest')] class extends Component
     </div>
 
     <form wire:submit="register">
+        @csrf
         <!-- Account Role Selection -->
         <div class="mb-4">
             <label class="block font-medium text-xs text-gray-500 mb-1.5">I am registering as</label>

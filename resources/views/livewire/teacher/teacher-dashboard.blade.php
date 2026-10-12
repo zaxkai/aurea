@@ -47,15 +47,55 @@
                 </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2" x-data="{ copiedId: null }">
+            <div class="flex flex-wrap items-center gap-2" x-data="{
+                copiedId: null,
+                copy(id, code) {
+                    const mark = () => {
+                        this.copiedId = id;
+                        setTimeout(() => {
+                            if (this.copiedId === id) this.copiedId = null;
+                        }, 2000);
+                    };
+
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(code).then(mark).catch(() => this.fallback(code, mark));
+                    } else {
+                        this.fallback(code, mark);
+                    }
+                },
+                fallback(text, cb) {
+                    try {
+                        const el = document.createElement('textarea');
+                        el.value = text;
+                        el.setAttribute('readonly', '');
+                        el.style.position = 'fixed';
+                        el.style.left = '-9999px';
+                        el.style.top = '0';
+                        document.body.appendChild(el);
+                        el.focus();
+                        el.select();
+                        const ok = document.execCommand('copy');
+                        document.body.removeChild(el);
+                        if (ok && cb) cb();
+                    } catch (e) {
+                        console.error('Failed to copy classroom code:', e);
+                    }
+                }
+            }">
                 @foreach ($classrooms as $cls)
                     <button type="button"
-                            @click="navigator.clipboard.writeText('{{ $cls->code }}'); copiedId = {{ $cls->id }}; setTimeout(() => copiedId = null, 2000)"
-                            class="inline-flex items-center gap-2 bg-white border border-blue-200/80 hover:border-blue-400 px-3 py-1.5 rounded-xl shadow-xs text-xs font-semibold text-[#000F2E] transition-all">
+                            @click="copy({{ $cls->id }}, '{{ $cls->code }}')"
+                            :class="copiedId === {{ $cls->id }} ? 'border-emerald-400 bg-emerald-50/60 text-emerald-800' : 'border-blue-200/80 bg-white hover:border-blue-400 text-[#000F2E]'"
+                            class="inline-flex items-center gap-2 border px-3 py-1.5 rounded-xl shadow-xs text-xs font-semibold transition-all cursor-pointer">
                         <span>{{ $cls->name }}:</span>
                         <span class="font-mono font-bold tracking-wider text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">{{ $cls->code }}</span>
-                        <span x-show="copiedId === {{ $cls->id }}" x-cloak class="text-emerald-600 font-bold text-[11px]">Copied!</span>
-                        <svg x-show="copiedId !== {{ $cls->id }}" class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <span x-show="copiedId === {{ $cls->id }}" x-cloak class="text-emerald-600 font-bold text-[11px] inline-flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Copied!
+                        </span>
+                        <svg x-show="copiedId !== {{ $cls->id }}" class="w-3.5 h-3.5 text-gray-400 hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                         </svg>
                     </button>

@@ -47,10 +47,15 @@ class ChatbotService
         }
         $contents[] = ['role' => 'user', 'parts' => [['text' => $userMessage]]];
 
+        $apiKey = config('services.gemini.key') ?: env('GEMINI_API_KEY');
+        if (! $apiKey) {
+            return 'Maaf, konfigurasi AI Aurea sedang disiapkan 💙 Coba lagi sebentar ya.';
+        }
+
         foreach ($this->models as $model) {
             try {
-                $response = Http::timeout(30)
-                    ->withHeaders(['x-goog-api-key' => env('GEMINI_API_KEY')])
+                $response = Http::timeout(10)
+                    ->withHeaders(['x-goog-api-key' => $apiKey])
                     ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", [
                         'system_instruction' => ['parts' => [['text' => $this->getSystemPrompt($userMessage)]]],
                         'contents' => $contents,
@@ -120,7 +125,7 @@ class ChatbotService
             'summary' => Str::limit(trim($journalContent), 220),
             'advice' => 'Coba beri dirimu waktu sejenak untuk memahami perasaan ini. Kamu tidak harus menyelesaikan semuanya sekaligus.',
         ];
-        $apiKey = env('GEMINI_API_KEY');
+        $apiKey = config('services.gemini.key') ?: env('GEMINI_API_KEY');
 
         if (! $apiKey) {
             return $fallback;
@@ -130,7 +135,7 @@ class ChatbotService
 
         foreach ($this->models as $model) {
             try {
-                $response = Http::timeout(30)
+                $response = Http::timeout(10)
                     ->withHeaders(['x-goog-api-key' => $apiKey])
                     ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", [
                         'system_instruction' => ['parts' => [['text' => 'Kamu adalah Aurea, pendamping journaling yang hangat untuk remaja. Gunakan bahasa utama yang sama dengan isi catatan jurnal untuk summary dan advice; abaikan bahasa instruksi, label mood, dan properti JSON. Jaga privasi, jangan mendiagnosis atau menyarankan obat. Jika catatan mengandung risiko menyakiti diri, sarankan menghubungi orang dewasa tepercaya atau bantuan darurat.']]],

@@ -70,6 +70,11 @@ class CheckInController extends Controller
         // Update user streak
         $this->updateStreak($user);
 
+        // Notify teachers if student needs attention
+        if ($wellbeingIndex < 60 || in_array($checkIn->mood, ['stressed', 'exhausted'])) {
+            $this->notifyTeachersOfStudentAttention($user, $checkIn, $wellbeingIndex);
+        }
+
         return redirect()->route('dashboard')->with([
             'checkin_success' => true,
             'wellbeing_index' => $wellbeingIndex,
@@ -101,6 +106,46 @@ class CheckInController extends Controller
                 "You're on fire! You've checked in for {$user->current_streak} consecutive days.",
                 'fire',
                 'warning'
+            ));
+        }
+    }
+
+    /**
+     * Notify teachers when an enrolled student requires wellbeing attention.
+     */
+    private function notifyTeachersOfStudentAttention(mixed $student, mixed $checkIn, int $wellbeingIndex): void
+    {
+        $classrooms = $student->enrolledClassrooms()->with('teacher')->get();
+
+        foreach ($classrooms as $classroom) {
+            $teacher = $classroom->teacher;
+            if (! $teacher) {
+                continue;
+            }
+
+            // Deduplicate: avoid sending multiple attention alerts for the same student to the same teacher on the same day
+            $alreadyNotified = $teacher->notifications()
+                ->where('created_at', '>=', today())
+                ->where('data->type', 'warning')
+                ->where('data->message', 'like', "%{$student->name}%")
+                ->exists();
+
+            if ($alreadyNotified) {
+                continue;
+            }
+
+            $moodLabel = match ($checkIn->mood) {
+                'stressed' => 'Stres (Stressed)',
+                'exhausted' => 'Kelelahan (Exhausted)',
+                default => ucfirst($checkIn->mood),
+            };
+
+            $teacher->notify(new AppNotification(
+                '⚠️ Siswa Membutuhkan Perhatian',
+                "{$student->name} ({$classroom->name}) mencatat skor wellbeing {$wellbeingIndex}% dengan kondisi emosional {$moodLabel}.",
+                'warning',
+                'warning',
+                route('teacher.students', ['search' => $student->name, 'statusFilter' => 'attention'])
             ));
         }
     }

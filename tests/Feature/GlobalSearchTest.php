@@ -2,6 +2,7 @@
 
 use App\Livewire\GlobalSearch;
 use App\Livewire\JournalPage;
+use App\Models\Classroom;
 use App\Models\Journal;
 use App\Models\User;
 use Livewire\Livewire;
@@ -136,4 +137,57 @@ it('filters journals on the journal page using search parameter', function () {
         ->call('clearSearch')
         ->assertSee('Walking in Nature')
         ->assertSee('Gym Workout');
+});
+
+it('shows student wellbeing to teachers and hides student-only pages', function () {
+    $teacher = User::factory()->create([
+        'role' => 'teacher',
+    ]);
+
+    Livewire::actingAs($teacher)
+        ->test(GlobalSearch::class)
+        ->set('query', 'student wel being')
+        ->assertSee('Student Wellbeing')
+        ->assertSee('/teacher/students')
+        ->set('query', 'wellbeing')
+        ->assertSee('Student Wellbeing')
+        ->set('query', 'murid')
+        ->assertSee('Student Wellbeing')
+        ->set('query', 'ai')
+        ->assertDontSee('AI Aurea')
+        ->set('query', 'tree')
+        ->assertDontSee('Habit Growth Tree')
+        ->set('query', 'journal')
+        ->assertDontSee('Write your thoughts')
+        ->set('query', 'dash')
+        ->assertSee('Dashboard');
+});
+
+it('allows teachers to search enrolled students in their classroom', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $student = User::factory()->create(['name' => 'Alex Turner', 'role' => 'student']);
+    $classroom = Classroom::create([
+        'teacher_id' => $teacher->id,
+        'name' => 'Class 10-A',
+        'code' => 'AUR-10A',
+    ]);
+    $classroom->students()->attach($student->id, ['joined_at' => now()]);
+
+    Livewire::actingAs($teacher)
+        ->test(GlobalSearch::class)
+        ->set('query', 'Alex')
+        ->assertSee('Alex Turner')
+        ->assertSee('Class 10-A')
+        ->call('selectStudent', 'Alex Turner')
+        ->assertRedirect(route('teacher.students', ['search' => 'Alex Turner']));
+});
+
+it('redirects teachers to student wellbeing when search is submitted without exact page match', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+
+    Livewire::actingAs($teacher)
+        ->test(GlobalSearch::class)
+        ->set('query', 'Julian')
+        ->call('submitSearch')
+        ->assertRedirect(route('teacher.students', ['search' => 'Julian']));
 });

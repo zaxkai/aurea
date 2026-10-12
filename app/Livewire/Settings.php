@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Livewire\Actions\Logout;
 use App\Models\Classroom;
+use App\Notifications\AppNotification;
 use Livewire\Component;
 
 class Settings extends Component
@@ -72,6 +73,17 @@ class Settings extends Component
         }
 
         $user->enrolledClassrooms()->attach($classroom->id, ['joined_at' => now()]);
+
+        if ($classroom->teacher) {
+            $classroom->teacher->notify(new AppNotification(
+                '🎓 Siswa Baru Bergabung',
+                "{$user->name} baru saja bergabung ke kelas {$classroom->name}.",
+                'student',
+                'info',
+                route('teacher.students', ['search' => $user->name])
+            ));
+        }
+
         $this->classCode = '';
         $this->classroomMessage = "Berhasil bergabung ke {$classroom->name} (Guru: {$classroom->teacher?->name}).";
     }

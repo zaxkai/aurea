@@ -33,6 +33,7 @@ new #[Layout('layouts.guest')] class extends Component
     </div>
 
     <form wire:submit="login">
+        @csrf
         <!-- Email Address -->
         <div>
             <label for="email" class="block font-medium text-xs text-gray-500 mb-1">Email</label>

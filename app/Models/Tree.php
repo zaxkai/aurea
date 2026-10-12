@@ -9,6 +9,8 @@ class Tree extends Model
 {
     protected $fillable = ['user_id', 'growth_percentage'];
 
+    protected ?int $cachedCompletedCount = null;
+
     public static function growthStageForCompletedItems(int $completedItems): int
     {
         return match (true) {
@@ -22,6 +24,10 @@ class Tree extends Model
 
     public function completedGrowthItemsCount(): int
     {
+        if ($this->cachedCompletedCount !== null) {
+            return $this->cachedCompletedCount;
+        }
+
         $user = $this->user;
         $completedTasks = $user->tasks()->where('is_done', true)->count();
         $completedHabits = $user->habits()
@@ -33,7 +39,7 @@ class Tree extends Model
             })
             ->count();
 
-        return $completedTasks + $completedHabits;
+        return $this->cachedCompletedCount = ($completedTasks + $completedHabits);
     }
 
     public function user()
@@ -51,16 +57,18 @@ class Tree extends Model
         $tasks = $user->tasks()->get(['is_done']);
         $totalItems = $habits->count() + $tasks->count();
 
-        if ($totalItems === 0) {
-            return;
-        }
-
         $completedHabits = $habits->filter(function (Habit $habit): bool {
             $log = $habit->logs->first();
 
             return $log !== null && $log->value_logged >= $habit->target_value;
         })->count();
         $completedTasks = $tasks->where('is_done', true)->count();
+
+        $this->cachedCompletedCount = $completedHabits + $completedTasks;
+
+        if ($totalItems === 0) {
+            return;
+        }
 
         $oldPercentage = $this->growth_percentage;
         $this->growth_percentage = (int) round((($completedHabits + $completedTasks) / $totalItems) * 100);

@@ -362,7 +362,14 @@
 
     <!-- Modal Check-in Lengkap (Evidence-Based Scoring Inputs) -->
     @if ($showDetailedModal)
-        <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy/60 p-3 backdrop-blur-sm sm:items-center sm:p-4">
+        <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy/60 p-3 backdrop-blur-sm sm:items-center sm:p-4"
+             x-data="{
+                 sleep: @js((float) $sleepDuration),
+                 physical: @js((int) $physicalActivityDuration),
+                 screen: @js((float) $screenTimeDuration),
+                 who5: @js((int) $who5Score),
+                 mood: @js($todayMood ?? 'neutral')
+             }">
             <div class="relative my-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-gray-100 bg-white p-5 shadow-2xl animate-in fade-in zoom-in duration-150 sm:max-h-[calc(100dvh-2rem)] sm:rounded-3xl sm:p-7">
                 <div class="flex items-center justify-between pb-4 border-b border-gray-100">
                     <div>
@@ -381,8 +388,9 @@
                         <div class="flex gap-2 flex-wrap">
                             @foreach ($moods as $key => $mood)
                                 <button type="button"
-                                        wire:click="$set('todayMood', '{{ $key }}')"
-                                        class="px-3.5 py-1.5 rounded-full text-xs font-semibold {{ $mood['bg'] }} {{ $mood['text'] }} {{ $todayMood === $key ? 'ring-2 ring-navy' : 'opacity-80' }}">
+                                        @click="mood = '{{ $key }}'; $wire.set('todayMood', '{{ $key }}', false)"
+                                        class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all {{ $mood['bg'] }} {{ $mood['text'] }}"
+                                        :class="mood === '{{ $key }}' ? 'ring-2 ring-navy opacity-100 scale-105 shadow-sm' : 'opacity-70 hover:opacity-100'">
                                     {{ $mood['emoji'] }} {{ $mood['label'] }}
                                 </button>
                             @endforeach
@@ -393,9 +401,11 @@
                     <div>
                         <div class="flex justify-between text-xs font-bold text-navy mb-1">
                             <span>Durasi Tidur Semalam</span>
-                            <span class="text-aurea font-extrabold">{{ $sleepDuration }} Jam</span>
+                            <span class="text-aurea font-extrabold" x-text="sleep + ' Jam'">{{ $sleepDuration }} Jam</span>
                         </div>
-                        <input type="range" min="3" max="12" step="0.5" wire:model.live="sleepDuration"
+                        <input type="range" min="3" max="12" step="0.5"
+                               x-model="sleep"
+                               wire:model="sleepDuration"
                                class="w-full accent-navy cursor-pointer">
                         <span class="text-[10px] text-gray-400">Rekomendasi remaja: 8 - 10 jam</span>
                     </div>
@@ -404,9 +414,11 @@
                     <div>
                         <div class="flex justify-between text-xs font-bold text-navy mb-1">
                             <span>Aktivitas Fisik Hari Ini</span>
-                            <span class="text-aurea font-extrabold">{{ $physicalActivityDuration }} Menit</span>
+                            <span class="text-aurea font-extrabold" x-text="physical + ' Menit'">{{ $physicalActivityDuration }} Menit</span>
                         </div>
-                        <input type="range" min="0" max="180" step="5" wire:model.live="physicalActivityDuration"
+                        <input type="range" min="0" max="180" step="5"
+                               x-model="physical"
+                               wire:model="physicalActivityDuration"
                                class="w-full accent-navy cursor-pointer">
                         <span class="text-[10px] text-gray-400">Pedoman WHO: minimal 60 menit sehari</span>
                     </div>
@@ -415,20 +427,24 @@
                     <div>
                         <div class="flex justify-between text-xs font-bold text-navy mb-1">
                             <span>Screen Time Rekreasional</span>
-                            <span class="text-aurea font-extrabold">{{ $screenTimeDuration }} Jam</span>
+                            <span class="text-aurea font-extrabold" x-text="screen + ' Jam'">{{ $screenTimeDuration }} Jam</span>
                         </div>
-                        <input type="range" min="0.5" max="14" step="0.5" wire:model.live="screenTimeDuration"
+                        <input type="range" min="0.5" max="14" step="0.5"
+                               x-model="screen"
+                               wire:model="screenTimeDuration"
                                class="w-full accent-navy cursor-pointer">
-                        <span class="text-[10px] text-gray-400">Batas wajar: < 4 jam sehari</span>
+                        <span class="text-[10px] text-gray-400">Batas wajar: &lt; 4 jam sehari</span>
                     </div>
 
                     <!-- WHO-5 Mental Well-being -->
                     <div>
                         <div class="flex justify-between text-xs font-bold text-navy mb-1">
                             <span>Indikator Mental Well-being (WHO-5)</span>
-                            <span class="text-aurea font-extrabold">{{ $who5Score }} / 100</span>
+                            <span class="text-aurea font-extrabold" x-text="who5 + ' / 100'">{{ $who5Score }} / 100</span>
                         </div>
-                        <input type="range" min="0" max="100" step="5" wire:model.live="who5Score"
+                        <input type="range" min="0" max="100" step="5"
+                               x-model="who5"
+                               wire:model="who5Score"
                                class="w-full accent-navy cursor-pointer">
                     </div>
 
@@ -445,9 +461,16 @@
                             class="px-4 py-2 rounded-full text-xs font-semibold text-gray-500 hover:text-navy">
                         Batal
                     </button>
-                    <button type="button" wire:click="saveDetailedCheckIn"
-                            class="px-6 py-2.5 rounded-full text-xs font-bold bg-navy text-white shadow-md hover:bg-opacity-95 transition">
-                        Hitung Index & Simpan
+                    <button type="button" wire:click="saveDetailedCheckIn" wire:loading.attr="disabled"
+                            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold bg-navy text-white shadow-md hover:bg-opacity-95 transition disabled:opacity-50">
+                        <span wire:loading.remove wire:target="saveDetailedCheckIn">Hitung Index & Simpan</span>
+                        <span wire:loading wire:target="saveDetailedCheckIn" class="inline-flex items-center gap-2">
+                            <svg class="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                            </svg>
+                            Menghitung...
+                        </span>
                     </button>
                 </div>
             </div>

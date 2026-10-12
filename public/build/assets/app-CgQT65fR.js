@@ -1,0 +1,1 @@
+document.addEventListener(`livewire:init`,()=>{Livewire.hook(`request`,({fail:e})=>{e(({status:e,preventDefault:t})=>{e===419&&(t(),window.location.reload())})})});

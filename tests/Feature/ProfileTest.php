@@ -33,3 +33,20 @@ test('profile information can be updated', function () {
     $this->assertSame('Test User', $user->name);
     $this->assertSame('test@example.com', $user->email);
 });
+
+test('teacher profile displays teacher role and teaching overview', function () {
+    $teacher = User::factory()->create([
+        'name' => 'Julian Casablancas',
+        'role' => 'teacher',
+    ]);
+
+    $this->actingAs($teacher);
+
+    $response = $this->get('/profile');
+
+    $response
+        ->assertOk()
+        ->assertSee('Teacher')
+        ->assertSee('Teaching Overview')
+        ->assertSee('Classrooms Managed');
+});

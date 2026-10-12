@@ -6,14 +6,18 @@ use App\Models\CheckIn;
 use App\Models\Classroom;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class StudentWellbeing extends Component
 {
+    #[Url]
     public string $search = '';
 
+    #[Url]
     public ?int $selectedClassroomId = null;
 
+    #[Url]
     public string $statusFilter = 'all'; // all, attention, healthy
 
     public function render()
@@ -38,25 +42,36 @@ class StudentWellbeing extends Component
         $studentsQuery = User::whereIn('id', $studentIds);
 
         if (! empty($this->search)) {
-            $studentsQuery->where(function ($q) {
-                $q->where('name', 'ilike', '%'.$this->search.'%')
-                    ->orWhere('first_name', 'ilike', '%'.$this->search.'%')
-                    ->orWhere('email', 'ilike', '%'.$this->search.'%');
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $studentsQuery->where(function ($q) use ($like) {
+                $q->where('name', $like, '%'.$this->search.'%')
+                    ->orWhere('first_name', $like, '%'.$this->search.'%')
+                    ->orWhere('email', $like, '%'.$this->search.'%');
             });
         }
 
-        $students = $studentsQuery->get()->map(function ($student) use ($pivots) {
+        $studentList = $studentsQuery->get();
+        $fetchedStudentIds = $studentList->pluck('id');
+
+        // Batch pre-fetch latest check-ins to eliminate N+1 queries
+        $latestCheckins = CheckIn::whereIn('user_id', $fetchedStudentIds)
+            ->orderByDesc('created_at')
+            ->get()
+            ->unique('user_id')
+            ->keyBy('user_id');
+
+        // Batch pre-fetch 30-day average wellbeing scores
+        $avgWellbeings = CheckIn::whereIn('user_id', $fetchedStudentIds)
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('user_id')
+            ->select('user_id', DB::raw('AVG(wellbeing_index) as avg_score'))
+            ->pluck('avg_score', 'user_id');
+
+        $students = $studentList->map(function ($student) use ($pivots, $latestCheckins, $avgWellbeings) {
             $classroomInfo = $pivots->get($student->id)?->first();
 
-            // Latest checkin for this student
-            $latestCheckin = CheckIn::where('user_id', $student->id)
-                ->latest('created_at')
-                ->first();
-
-            // Average wellbeing index over the past 30 days
-            $avgWellbeing = CheckIn::where('user_id', $student->id)
-                ->where('created_at', '>=', now()->subDays(30))
-                ->avg('wellbeing_index');
+            $latestCheckin = $latestCheckins->get($student->id);
+            $avgWellbeing = $avgWellbeings->get($student->id);
 
             $score = $avgWellbeing !== null ? (int) round($avgWellbeing) : ($latestCheckin?->wellbeing_index ?? 75);
 
