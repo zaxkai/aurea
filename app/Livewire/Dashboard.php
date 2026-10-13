@@ -294,7 +294,6 @@ class Dashboard extends Component
         }
 
         $log->save();
-        $this->refreshTreeGrowth();
     }
 
     public function openAddHabitModal(): void
@@ -420,7 +419,7 @@ class Dashboard extends Component
 
         $checkIns = $user->checkIns()
             ->whereBetween('check_in_date', [$startDate, $endDate])
-            ->get()
+            ->get(['check_in_date', 'mood'])
             ->keyBy(fn ($c) => $c->check_in_date->format('Y-m-d'));
 
         for ($i = 0; $i < 42; $i++) {
@@ -454,29 +453,28 @@ class Dashboard extends Component
         $isPremium = $user->isPremium();
         $freeHabitLimit = $this->freeHabitLimit();
 
-        $checklistHabits = $user->habits()
+        // Single query for all active habits with today's logs
+        $allActiveHabits = $user->habits()
             ->where('is_active', true)
-            ->where('type', 'checklist')
-            ->where('source', 'system')
             ->with(['logs' => fn ($q) => $q->whereDate('log_date', today())])
             ->get();
 
-        $progressHabitsQuery = $user->habits()
-            ->where('is_active', true)
+        $checklistHabits = $allActiveHabits
+            ->where('type', 'checklist')
+            ->where('source', 'system')
+            ->values();
+
+        $progressHabitsCollection = $allActiveHabits
             ->where('type', 'progress')
             ->whereIn('source', ['system', 'user'])
-            ->orderBy('source')
-            ->orderBy('id')
-            ->with(['logs' => fn ($q) => $q->whereDate('log_date', today())]);
+            ->sortBy(fn ($h) => $h->source.'_'.$h->id)
+            ->values();
 
-        if (! $isPremium) {
-            $progressHabitsQuery->limit($freeHabitLimit);
-        }
-
-        $progressHabits = $progressHabitsQuery->get();
+        $progressHabits = $isPremium ? $progressHabitsCollection : $progressHabitsCollection->take($freeHabitLimit);
 
         $tree = $user->tree()->firstOrCreate([], ['growth_percentage' => 30]);
-        $tree->refreshGrowthPercentage();
+        $tree->setRelation('user', $user);
+        $tree->refreshGrowthPercentage($allActiveHabits);
         $completedGrowthItemsCount = $tree->completedGrowthItemsCount();
 
         return view('livewire.dashboard', [

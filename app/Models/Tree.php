@@ -47,13 +47,22 @@ class Tree extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function refreshGrowthPercentage(): void
+    public function refreshGrowthPercentage(?iterable $habits = null): void
     {
-        $user = $this->user;
-        $habits = $user->habits()
-            ->where('is_active', true)
-            ->with(['logs' => fn ($query) => $query->whereDate('log_date', today())])
-            ->get();
+        $user = $this->relationLoaded('user') ? $this->user : ($this->user()->first());
+        if (! $user) {
+            return;
+        }
+
+        if ($habits === null) {
+            $habits = $user->habits()
+                ->where('is_active', true)
+                ->with(['logs' => fn ($query) => $query->whereDate('log_date', today())])
+                ->get();
+        } else {
+            $habits = collect($habits);
+        }
+
         $tasks = $user->tasks()->get(['is_done']);
         $totalItems = $habits->count() + $tasks->count();
 

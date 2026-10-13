@@ -137,18 +137,25 @@
                                     $log = $habit->logs->first();
                                     $isDone = ($log->value_logged ?? 0) >= $habit->target_value;
                                 @endphp
-                                <div class="flex items-center justify-between px-4 py-3 rounded-2xl bg-gray-50/80 border border-gray-100 hover:bg-gray-100/70 transition">
-                                    <span class="text-xs font-semibold {{ $isDone ? 'line-through text-gray-400' : 'text-navy' }}">
+                                <div wire:key="checklist-habit-{{ $habit->id }}"
+                                     x-data="{ done: @js($isDone) }"
+                                     @click="done = !done"
+                                     wire:click="toggleHabit({{ $habit->id }})"
+                                     wire:loading.class="opacity-75"
+                                     wire:target="toggleHabit({{ $habit->id }})"
+                                     class="flex items-center justify-between px-4 py-3 rounded-2xl bg-gray-50/80 border border-gray-100 hover:bg-gray-100/70 transition cursor-pointer select-none group">
+                                    <span class="text-xs font-semibold transition-colors {{ $isDone ? 'line-through text-gray-400' : 'text-navy' }}"
+                                          :class="done ? 'line-through text-gray-400' : 'text-navy'">
                                         {{ $habit->name }}
                                     </span>
                                     <button type="button"
-                                            wire:click="toggleHabit({{ $habit->id }})"
-                                            class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all {{ $isDone ? 'bg-navy border-navy text-white shadow-sm' : 'border-gray-300 hover:border-navy' }}">
-                                        @if ($isDone)
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        @endif
+                                            wire:loading.attr="disabled"
+                                            wire:target="toggleHabit({{ $habit->id }})"
+                                            class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0 pointer-events-none {{ $isDone ? 'bg-navy border-navy text-white shadow-sm' : 'border-gray-300 group-hover:border-navy bg-white' }}"
+                                            :class="done ? 'bg-navy border-navy text-white shadow-sm' : 'border-gray-300 group-hover:border-navy bg-white'">
+                                        <svg x-show="done" style="{{ $isDone ? '' : 'display: none;' }}" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                        </svg>
                                     </button>
                                 </div>
                             @empty
@@ -176,7 +183,7 @@
                                     @endif
                                 </p>
                             </div>
-                            <button type="button" wire:click="openAddHabitModal" title="{{ __('Add habit') }}" aria-label="{{ __('Add habit') }}" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy text-white transition hover:bg-navy/90 focus:outline-none focus:ring-2 focus:ring-aurea focus:ring-offset-2">
+                            <button type="button" wire:click="openAddHabitModal" wire:loading.attr="disabled" wire:target="openAddHabitModal" title="{{ __('Add habit') }}" aria-label="{{ __('Add habit') }}" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy text-white transition hover:bg-navy/90 active:scale-95 focus:outline-none focus:ring-2 focus:ring-aurea focus:ring-offset-2">
                                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-width="2" /></svg>
                             </button>
                         </div>
@@ -188,35 +195,54 @@
                                     $currentVal = $log->value_logged ?? 0;
                                     $percent = min(100, (int) round(($currentVal / $habit->target_value) * 100));
                                     $isFull = $percent >= 100;
+                                    $increment = max(1, (int) round($habit->target_value / 4));
                                 @endphp
-                                <div>
+                                <div wire:key="progress-habit-{{ $habit->id }}"
+                                     x-data="{
+                                         current: @js($currentVal),
+                                         target: @js($habit->target_value),
+                                         inc: @js($increment),
+                                         addProgress() {
+                                             if (this.current >= this.target) {
+                                                 this.current = 0;
+                                             } else {
+                                                 this.current = Math.min(this.target, this.current + this.inc);
+                                             }
+                                         }
+                                     }"
+                                     class="group">
                                     <div class="flex items-center justify-between text-xs mb-1.5">
                                         <div>
                                             <p class="font-semibold text-navy">{{ $habit->name }}</p>
-                                            <p class="text-[11px] text-gray-400 mt-0.5">{{ $currentVal }}/{{ $habit->target_value }} {{ $habit->unit }}</p>
+                                            <p class="text-[11px] text-gray-400 mt-0.5">
+                                                <span x-text="current">{{ $currentVal }}</span>/{{ $habit->target_value }} {{ $habit->unit }}
+                                            </p>
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <button type="button"
+                                                    @click="addProgress()"
                                                     wire:click="toggleHabit({{ $habit->id }})"
-                                                    class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all {{ $isFull ? 'bg-navy border-navy text-white' : 'border-gray-300 hover:border-navy' }}"
+                                                    wire:loading.attr="disabled"
+                                                    wire:target="toggleHabit({{ $habit->id }})"
+                                                    class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0 active:scale-90 {{ $isFull ? 'bg-navy border-navy text-white' : 'border-gray-300 hover:border-navy' }}"
+                                                    :class="current >= target ? 'bg-navy border-navy text-white shadow-sm' : 'border-gray-300 hover:border-navy bg-white'"
                                                     title="{{ __('Add progress') }}">
-                                                @if ($isFull)
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                @else
-                                                    <span class="text-[10px] text-gray-400 font-bold">+</span>
-                                                @endif
+                                                <span x-show="current < target" style="{{ $isFull ? 'display: none;' : '' }}" class="text-[10px] text-gray-400 font-bold group-hover:text-navy">+</span>
+                                                <svg x-show="current >= target" style="{{ $isFull ? '' : 'display: none;' }}" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                                </svg>
                                             </button>
                                             @if ($habit->source === 'user')
-                                                <button type="button" wire:click="removeCustomHabit({{ $habit->id }})" title="{{ __('Disable habit') }}" aria-label="{{ __('Disable') }} {{ $habit->name }}" class="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-rose-50 hover:text-rose-600">
+                                                <button type="button" wire:click="removeCustomHabit({{ $habit->id }})" wire:loading.attr="disabled" wire:target="removeCustomHabit({{ $habit->id }})" title="{{ __('Disable habit') }}" aria-label="{{ __('Disable') }} {{ $habit->name }}" class="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-rose-50 hover:text-rose-600">
                                                     <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M5 7l1 13h12l1-13M9 7V4h6v3" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" /></svg>
                                                 </button>
                                             @endif
                                         </div>
                                     </div>
                                     <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                                        <div class="bg-navy h-2 rounded-full transition-all duration-300" style="width: {{ $percent }}%"></div>
+                                        <div class="bg-navy h-2 rounded-full transition-all duration-300"
+                                             :style="'width: ' + Math.min(100, Math.round((current / target) * 100)) + '%'"
+                                             style="width: {{ $percent }}%"></div>
                                     </div>
                                 </div>
                             @empty
