@@ -92,11 +92,12 @@ class CheckInController extends Controller
         $lastCheckInDate = $user->last_check_in_date;
 
         if ($lastCheckInDate && $lastCheckInDate->isYesterday()) {
-            $user->increment('current_streak');
+            $user->current_streak += 1;
         } elseif (! $lastCheckInDate || ! $lastCheckInDate->isToday()) {
             $user->current_streak = 1;
         }
 
+        $user->longest_streak = max($user->longest_streak ?? 0, $user->current_streak);
         $user->last_check_in_date = today();
         $user->save();
 

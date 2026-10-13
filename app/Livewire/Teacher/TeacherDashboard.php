@@ -19,6 +19,11 @@ class TeacherDashboard extends Component
 
     public string $newClassDescription = '';
 
+    public function boot(): void
+    {
+        abort_unless(auth()->user()?->isTeacher(), 403);
+    }
+
     public function createClassroom(): void
     {
         $this->validate([

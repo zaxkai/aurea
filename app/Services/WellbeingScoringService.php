@@ -48,19 +48,19 @@ class WellbeingScoringService
         }
 
         // Sleep pattern detection
-        if ($checkIn->sleep_duration < 7) {
+        if (! is_null($checkIn->sleep_duration) && $checkIn->sleep_duration < 7) {
             $insights[] = __('Your sleep duration is below the ideal limit for your age.');
             $recommendations[] = __('Try to sleep earlier to achieve 8 hours of rest.');
         }
 
         // Screen time vs Sleep correlation logic
-        if ($checkIn->screen_time_duration > 5 && $checkIn->sleep_duration < 7) {
+        if (! is_null($checkIn->screen_time_duration) && ! is_null($checkIn->sleep_duration) && $checkIn->screen_time_duration > 5 && $checkIn->sleep_duration < 7) {
             $insights[] = __('High screen time seems to be affecting your sleep duration lately.');
             $recommendations[] = __('Reduce gadget usage at least 1 hour before bed.');
         }
 
         // Activity logic
-        if ($checkIn->physical_activity_duration < 30) {
+        if (! is_null($checkIn->physical_activity_duration) && $checkIn->physical_activity_duration < 30) {
             $insights[] = __('Your physical activity is considered low today.');
             $recommendations[] = __('Take time for a light walk or stretching for 15-30 minutes tomorrow.');
         }

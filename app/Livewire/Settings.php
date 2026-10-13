@@ -4,7 +4,9 @@ namespace App\Livewire;
 
 use App\Livewire\Actions\Logout;
 use App\Models\Classroom;
+use App\Models\User;
 use App\Notifications\AppNotification;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class Settings extends Component
@@ -25,10 +27,20 @@ class Settings extends Component
 
     public function updateProfile(): void
     {
-        auth()->user()->update([
-            'name' => $this->name,
-            'email' => $this->email,
+        $user = auth()->user();
+
+        $validated = $this->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
         ]);
+
+        $user->fill($validated);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
 
         session()->flash('saved', 'Perubahan tersimpan.');
     }
@@ -72,7 +84,7 @@ class Settings extends Component
             return;
         }
 
-        $user->enrolledClassrooms()->attach($classroom->id, ['joined_at' => now()]);
+        $user->enrolledClassrooms()->syncWithoutDetaching([$classroom->id => ['joined_at' => now()]]);
 
         if ($classroom->teacher) {
             $classroom->teacher->notify(new AppNotification(
@@ -104,8 +116,11 @@ class Settings extends Component
 
     public function deleteAccount(): void
     {
-        auth()->user()->delete();
+        $user = auth()->user();
         auth()->guard('web')->logout();
+        session()->invalidate();
+        session()->regenerateToken();
+        $user->delete();
         $this->redirect('/', navigate: true);
     }
 

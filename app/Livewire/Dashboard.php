@@ -269,7 +269,7 @@ class Dashboard extends Component
         if ($user->last_check_in_date?->isSameDay($yesterday)) {
             $user->current_streak += 1;
         } elseif (! $user->last_check_in_date?->isSameDay(today())) {
-            $user->current_streak = max(1, $user->current_streak);
+            $user->current_streak = 1;
         }
 
         $user->longest_streak = max($user->longest_streak, $user->current_streak);

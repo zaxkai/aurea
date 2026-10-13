@@ -20,6 +20,11 @@ class StudentWellbeing extends Component
     #[Url]
     public string $statusFilter = 'all'; // all, attention, healthy
 
+    public function boot(): void
+    {
+        abort_unless(auth()->user()?->isTeacher(), 403);
+    }
+
     public function render()
     {
         $teacher = auth()->user();

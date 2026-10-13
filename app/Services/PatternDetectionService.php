@@ -66,7 +66,7 @@ class PatternDetectionService
 
         if (empty($patterns)) {
             // Only congratulate if the average wellbeing is good. Otherwise, just state it's stable.
-            $avgWellbeing = $checkIns->pluck('wellbeing_index')->filter()->average() ?? 0;
+            $avgWellbeing = $checkIns->pluck('wellbeing_index')->filter(fn ($v) => ! is_null($v))->average() ?? 0;
             if ($avgWellbeing >= 70) {
                 $patterns[] = __('Your daily patterns look stable and healthy. Keep up the consistency!');
             } else {
@@ -86,7 +86,7 @@ class PatternDetectionService
      */
     private function detectTrend(Collection $checkIns, string $field): string
     {
-        $values = $checkIns->pluck($field)->filter()->values();
+        $values = $checkIns->pluck($field)->filter(fn ($v) => ! is_null($v))->values();
 
         if ($values->count() < 3) {
             return 'insufficient';
