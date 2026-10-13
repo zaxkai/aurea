@@ -178,10 +178,14 @@
 
     <!-- Modal: Create New Classroom -->
     @if ($showCreateModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/50 backdrop-blur-xs"
+        <div class="fixed inset-0 z-50 overflow-y-auto"
              x-data
              @keydown.escape.window="$wire.set('showCreateModal', false)">
-            <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-6 relative border border-gray-100">
+            <!-- Full-screen Backdrop -->
+            <div class="fixed inset-0 bg-navy/50 backdrop-blur-xs transition-opacity" wire:click="$set('showCreateModal', false)" aria-hidden="true"></div>
+
+            <div class="relative flex min-h-full items-center justify-center p-4">
+                <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-6 relative border border-gray-100">
                 <div class="flex items-center justify-between">
                     <div>
                         <h3 class="text-xl font-extrabold text-[#000F2E]">Create New Classroom</h3>
@@ -234,6 +238,7 @@
                         </button>
                     </div>
                 </form>
+            </div>
             </div>
         </div>
     @endif

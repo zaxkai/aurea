@@ -452,9 +452,13 @@ new class extends Component
 
     {{-- Edit Profile Modal --}}
     @if ($showEditModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-navy/50 p-4 backdrop-blur-sm" wire:click.self="closeEditModal">
-            <section role="dialog" aria-modal="true" aria-labelledby="edit-profile-title"
-                     class="my-auto w-full max-w-md rounded-2xl border border-gray-100 bg-white p-5 shadow-2xl sm:p-7">
+        <div class="fixed inset-0 z-50 overflow-y-auto">
+            <!-- Full-screen Backdrop -->
+            <div class="fixed inset-0 bg-navy/60 backdrop-blur-sm transition-opacity" wire:click="closeEditModal" aria-hidden="true"></div>
+
+            <div class="relative flex min-h-full items-center justify-center p-4">
+                <section role="dialog" aria-modal="true" aria-labelledby="edit-profile-title"
+                         class="relative w-full max-w-md rounded-2xl border border-gray-100 bg-white p-5 shadow-2xl sm:p-7">
                 <div class="flex items-start justify-between gap-4 mb-6">
                     <div>
                         <h2 id="edit-profile-title" class="text-lg font-bold text-navy">Edit Profile</h2>
@@ -535,6 +539,7 @@ new class extends Component
                     </div>
                 </form>
             </section>
+            </div>
         </div>
     @endif
 </div>

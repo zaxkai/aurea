@@ -123,9 +123,13 @@
     </section>
 
     @if ($showWriteModal || $showSummaryModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-navy/20 p-4 backdrop-blur-sm" wire:click.self="closeModals">
-            @if ($showWriteModal)
-                <section role="dialog" aria-modal="true" aria-labelledby="write-journal-title" class="my-auto w-full max-w-[430px] rounded-[20px] border border-slate-200 bg-[#f5f7fc] p-5 shadow-2xl sm:p-7">
+        <div class="fixed inset-0 z-50 overflow-y-auto">
+            <!-- Full-screen Backdrop -->
+            <div class="fixed inset-0 bg-navy/40 backdrop-blur-sm transition-opacity" wire:click="closeModals" aria-hidden="true"></div>
+
+            <div class="relative flex min-h-full items-center justify-center p-4">
+                @if ($showWriteModal)
+                    <section role="dialog" aria-modal="true" aria-labelledby="write-journal-title" class="relative w-full max-w-[430px] rounded-[20px] border border-slate-200 bg-[#f5f7fc] p-5 shadow-2xl sm:p-7">
                     <div class="mb-4 flex items-center justify-between gap-4">
                         <h2 id="write-journal-title" class="text-2xl font-bold text-navy">Write Journal</h2>
                         <button type="button" wire:click="closeModals" aria-label="Close" class="flex h-8 w-8 items-center justify-center rounded-md bg-slate-200 text-navy transition hover:bg-slate-300">
@@ -192,6 +196,7 @@
                     </div>
                 </section>
             @endif
+            </div>
         </div>
     @endif
 </div>

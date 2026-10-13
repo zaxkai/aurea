@@ -57,22 +57,24 @@
             </div>
 
             <!-- Mood Selector Pills (Row of 5) -->
-            <div class="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
-                @foreach ($moods as $key => $mood)
-                    @php
-                        $isActive = ($todayMood === $key);
-                    @endphp
-                    <button type="button"
-                            wire:click="checkIn('{{ $key }}')"
-                            class="min-w-[124px] px-4 py-2.5 rounded-full font-semibold text-sm flex items-center justify-center gap-2.5 transition-all duration-200 shrink-0 border {{ $isActive ? ($mood['active_class'] ?? 'bg-white border-navy text-navy font-bold ring-2 ring-navy/20 shadow-sm scale-105') : ($mood['idle_class'] ?? 'bg-white text-gray-700 border-gray-200 shadow-2xs hover:bg-gray-50') }}">
-                        <div class="w-6 h-6 rounded-full bg-white/90 p-0.5 shadow-2xs flex items-center justify-center overflow-hidden shrink-0">
-                            <img src="{{ asset('images/journal/' . ($mood['mascot'] ?? 'maskot-journal3.png')) }}"
-                                 alt="{{ $mood['label'] }}"
-                                 class="w-full h-full object-contain">
-                        </div>
-                        <span>{{ $mood['label'] }}</span>
-                    </button>
-                @endforeach
+            <div class="overflow-x-auto py-3 px-2 -mx-2 scrollbar-none">
+                <div class="flex items-center gap-3.5 min-w-max py-1 px-1">
+                    @foreach ($moods as $key => $mood)
+                        @php
+                            $isActive = ($todayMood === $key);
+                        @endphp
+                        <button type="button"
+                                wire:click="checkIn('{{ $key }}')"
+                                class="min-w-[126px] px-4 py-2.5 rounded-full font-semibold text-sm flex items-center justify-center gap-2.5 transition-all duration-200 shrink-0 border {{ $isActive ? ($mood['active_class'] ?? 'bg-white border-navy text-navy font-bold ring-2 ring-navy/20 shadow-sm scale-105') : ($mood['idle_class'] ?? 'bg-white text-gray-700 border-gray-200 shadow-2xs hover:bg-gray-50') }}">
+                            <div class="w-6 h-6 rounded-full bg-white/90 p-0.5 shadow-2xs flex items-center justify-center overflow-hidden shrink-0">
+                                <img src="{{ asset('images/journal/' . ($mood['mascot'] ?? 'maskot-journal3.png')) }}"
+                                     alt="{{ $mood['label'] }}"
+                                     class="w-full h-full object-contain">
+                            </div>
+                            <span>{{ $mood['label'] }}</span>
+                        </button>
+                    @endforeach
+                </div>
             </div>
 
             <!-- AI Insight & Well-being Index Banner (When Check-in is Active) -->
@@ -311,65 +313,79 @@
     </div>
 
     @if ($showAddHabitModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-navy/50 p-4 backdrop-blur-sm" wire:click.self="closeAddHabitModal">
-            <section role="dialog" aria-modal="true" aria-labelledby="add-habit-title" class="my-auto w-full max-w-md rounded-2xl border border-gray-100 bg-white p-5 shadow-2xl sm:p-6">
-                <div class="mb-5 flex items-start justify-between gap-4">
-                    <div>
-                        <h2 id="add-habit-title" class="text-lg font-bold text-navy">Add custom habit</h2>
-                        <p class="mt-1 text-xs text-gray-500">Add habits tailored to your personal goals.</p>
-                    </div>
-                    <button type="button" wire:click="closeAddHabitModal" aria-label="Close" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-navy">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
-                    </button>
-                </div>
+        <div class="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="add-habit-title">
+            <!-- Full-screen Backdrop (Covers 100% of viewport without padding clipping) -->
+            <div class="fixed inset-0 bg-navy/60 backdrop-blur-sm transition-opacity" wire:click="closeAddHabitModal" aria-hidden="true"></div>
 
-                <form wire:submit="addCustomHabit" class="space-y-4">
-                    <div>
-                        <label for="custom-habit-name" class="mb-1.5 block text-xs font-semibold text-navy">Habit name</label>
-                        <input id="custom-habit-name" type="text" maxlength="80" wire:model="customHabitName" placeholder="e.g. Read for 15 minutes" class="w-full rounded-xl border-gray-200 text-sm text-navy placeholder:text-gray-400 focus:border-aurea focus:ring-aurea">
-                        @error('customHabitName') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
+            <!-- Dialog Container -->
+            <div class="relative flex min-h-full items-center justify-center p-4">
+                <section class="relative w-full max-w-md rounded-2xl border border-gray-100 bg-white p-5 shadow-2xl sm:p-6">
+                    <div class="mb-5 flex items-start justify-between gap-4">
                         <div>
-                            <label for="custom-habit-target" class="mb-1.5 block text-xs font-semibold text-navy">Daily target</label>
-                            <input id="custom-habit-target" type="number" min="1" max="10000" wire:model="customHabitTarget" class="w-full rounded-xl border-gray-200 text-sm text-navy focus:border-aurea focus:ring-aurea">
-                            @error('customHabitTarget') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                            <h2 id="add-habit-title" class="text-lg font-bold text-navy">Add custom habit</h2>
+                            <p class="mt-1 text-xs text-gray-500">Add habits tailored to your personal goals.</p>
                         </div>
+                        <button type="button" wire:click="closeAddHabitModal" aria-label="Close" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-navy">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+                        </button>
+                    </div>
+
+                    <form wire:submit="addCustomHabit" class="space-y-4">
                         <div>
-                            <label for="custom-habit-unit" class="mb-1.5 block text-xs font-semibold text-navy">Unit</label>
-                            <input id="custom-habit-unit" type="text" maxlength="24" wire:model="customHabitUnit" placeholder="minutes / times" class="w-full rounded-xl border-gray-200 text-sm text-navy placeholder:text-gray-400 focus:border-aurea focus:ring-aurea">
-                            @error('customHabitUnit') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                            <label for="custom-habit-name" class="mb-1.5 block text-xs font-semibold text-navy">Habit name</label>
+                            <input id="custom-habit-name" type="text" maxlength="80" wire:model="customHabitName" placeholder="e.g. Read for 15 minutes" class="w-full rounded-xl border-gray-200 text-sm text-navy placeholder:text-gray-400 focus:border-aurea focus:ring-aurea">
+                            @error('customHabitName') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                         </div>
-                    </div>
-                    <div class="flex justify-end gap-2 pt-2">
-                        <button type="button" wire:click="closeAddHabitModal" class="min-h-10 rounded-xl px-4 text-sm font-semibold text-gray-500 transition hover:bg-gray-100">Cancel</button>
-                        <button type="submit" class="min-h-10 rounded-xl bg-navy px-5 text-sm font-semibold text-white transition hover:bg-navy/90">Add habit</button>
-                    </div>
-                </form>
-            </section>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label for="custom-habit-target" class="mb-1.5 block text-xs font-semibold text-navy">Daily target</label>
+                                <input id="custom-habit-target" type="number" min="1" max="10000" wire:model="customHabitTarget" class="w-full rounded-xl border-gray-200 text-sm text-navy focus:border-aurea focus:ring-aurea">
+                                @error('customHabitTarget') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label for="custom-habit-unit" class="mb-1.5 block text-xs font-semibold text-navy">Unit</label>
+                                <input id="custom-habit-unit" type="text" maxlength="24" wire:model="customHabitUnit" placeholder="minutes / times" class="w-full rounded-xl border-gray-200 text-sm text-navy placeholder:text-gray-400 focus:border-aurea focus:ring-aurea">
+                                @error('customHabitUnit') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-2 pt-2">
+                            <button type="button" wire:click="closeAddHabitModal" class="min-h-10 rounded-xl px-4 text-sm font-semibold text-gray-500 transition hover:bg-gray-100">Cancel</button>
+                            <button type="submit" class="min-h-10 rounded-xl bg-navy px-5 text-sm font-semibold text-white transition hover:bg-navy/90">Add habit</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
         </div>
     @endif
 
     @if ($showHabitUpgradeModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-navy/50 p-4 backdrop-blur-sm" wire:click.self="closeHabitUpgradeModal">
-            <section role="dialog" aria-modal="true" aria-labelledby="habit-upgrade-title" class="my-auto w-full max-w-md rounded-2xl border border-gray-100 bg-white p-5 shadow-2xl sm:p-6">
-                <div class="flex flex-col items-center gap-4 text-center">
-                    <div>
-                        <h2 id="habit-upgrade-title" class="text-lg font-bold text-navy">Your free habits are full</h2>
-                        <p class="mt-2 text-sm leading-relaxed text-gray-600">You have used {{ $freeHabitLimit }} habits. Unlock Premium for unlimited habits.</p>
+        <div class="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="habit-upgrade-title">
+            <!-- Full-screen Backdrop (Covers 100% of viewport without padding clipping) -->
+            <div class="fixed inset-0 bg-navy/60 backdrop-blur-sm transition-opacity" wire:click="closeHabitUpgradeModal" aria-hidden="true"></div>
+
+            <!-- Dialog Container -->
+            <div class="relative flex min-h-full items-center justify-center p-4">
+                <section class="relative w-full max-w-md rounded-2xl border border-gray-100 bg-white p-5 shadow-2xl sm:p-6">
+                    <div class="flex flex-col items-center gap-4 text-center">
+                        <div>
+                            <h2 id="habit-upgrade-title" class="text-lg font-bold text-navy">Your free habits are full</h2>
+                            <p class="mt-2 text-sm leading-relaxed text-gray-600">You have used {{ $freeHabitLimit }} habits. Unlock Premium for unlimited habits.</p>
+                        </div>
+                        <div class="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
+                            <a href="{{ route('premium') }}" class="inline-flex min-h-10 items-center justify-center rounded-xl bg-navy px-5 text-sm font-semibold text-white transition hover:bg-navy/90">Unlock Premium</a>
+                            <button type="button" wire:click="closeHabitUpgradeModal" class="min-h-10 rounded-xl px-5 text-sm font-semibold text-gray-500 transition hover:bg-gray-100">Not now</button>
+                        </div>
                     </div>
-                    <div class="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
-                        <a href="{{ route('premium') }}" class="inline-flex min-h-10 items-center justify-center rounded-xl bg-navy px-5 text-sm font-semibold text-white transition hover:bg-navy/90">Unlock Premium</a>
-                        <button type="button" wire:click="closeHabitUpgradeModal" class="min-h-10 rounded-xl px-5 text-sm font-semibold text-gray-500 transition hover:bg-gray-100">Not now</button>
-                    </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </div>
     @endif
 
     <!-- Modal Check-in Lengkap (Evidence-Based Scoring Inputs) -->
     @if ($showDetailedModal)
-        <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy/60 p-3 backdrop-blur-sm sm:items-center sm:p-4"
+        <div class="fixed inset-0 z-50 overflow-y-auto"
+             role="dialog"
+             aria-modal="true"
              x-data="{
                  sleep: @js((float) $sleepDuration),
                  physical: @js((int) $physicalActivityDuration),
@@ -377,7 +393,12 @@
                  who5: @js((int) $who5Score),
                  mood: @js($todayMood ?? 'neutral')
              }">
-            <div class="relative my-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-gray-100 bg-white p-5 shadow-2xl animate-in fade-in zoom-in duration-150 sm:max-h-[calc(100dvh-2rem)] sm:rounded-3xl sm:p-7">
+            <!-- Full-screen Backdrop (Covers 100% of viewport without padding clipping) -->
+            <div class="fixed inset-0 bg-navy/60 backdrop-blur-sm transition-opacity" wire:click="closeDetailedModal" aria-hidden="true"></div>
+
+            <!-- Dialog Container -->
+            <div class="relative flex min-h-full items-start justify-center p-3 sm:items-center sm:p-4">
+                <div class="relative my-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-gray-100 bg-white p-5 shadow-2xl animate-in fade-in zoom-in duration-150 sm:max-h-[calc(100dvh-2rem)] sm:rounded-3xl sm:p-7">
                 <div class="flex items-center justify-between pb-4 border-b border-gray-100">
                     <div>
                         <h3 class="text-lg font-bold text-navy">Daily Evidence Check-In</h3>
