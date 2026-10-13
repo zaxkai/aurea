@@ -84,6 +84,7 @@
             }">
                 @foreach ($classrooms as $cls)
                     <button type="button"
+                            wire:key="cls-copy-{{ $cls->id }}"
                             @click="copy({{ $cls->id }}, '{{ $cls->code }}')"
                             :class="copiedId === {{ $cls->id }} ? 'border-emerald-400 bg-emerald-50/60 text-emerald-800' : 'border-blue-200/80 bg-white hover:border-blue-400 text-[#000F2E]'"
                             class="inline-flex items-center gap-2 border px-3 py-1.5 rounded-xl shadow-xs text-xs font-semibold transition-all cursor-pointer">
@@ -152,7 +153,7 @@
 
         <div class="bg-[#e4ebfc] rounded-[28px] p-6 sm:p-8 space-y-4 shadow-sm">
             @foreach ($moodStats as $key => $mood)
-                <div class="flex items-center gap-4 sm:gap-6">
+                <div wire:key="mood-stat-{{ $key }}" class="flex items-center gap-4 sm:gap-6">
                     <!-- Mood Label with Mascot -->
                     <div class="flex items-center gap-2.5 w-28 sm:w-32 shrink-0">
                         <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full {{ $mood['bg_color'] }} p-1 shadow-2xs flex items-center justify-center shrink-0 border border-black/5">

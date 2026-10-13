@@ -62,7 +62,8 @@
 
                     <div class="mt-1 space-y-1">
                         @foreach ($matchedPages as $page)
-                            <a href="{{ route($page['route']) }}"
+                            <a wire:key="search-page-{{ $page['route'] }}"
+                               href="{{ route($page['route']) }}"
                                wire:click.prevent="selectPage('{{ $page['route'] }}')"
                                class="group flex items-center justify-between gap-3 rounded-xl p-2.5 text-left transition hover:bg-gray-50 active:bg-gray-100 border border-transparent hover:border-gray-100">
                                 <div class="flex items-center gap-3 min-w-0">
@@ -142,8 +143,9 @@
 
                     <div class="mt-1 space-y-1">
                         @foreach ($matchedStudents as $student)
-                            <a href="{{ route('teacher.students', ['search' => $student['name']]) }}"
-                               wire:click.prevent="selectStudent('{{ addslashes($student['name']) }}')"
+                            <a wire:key="search-student-{{ $student['id'] }}"
+                               href="{{ route('teacher.students', ['search' => $student['name']]) }}"
+                               wire:click.prevent="selectStudent({{ $student['id'] }})"
                                class="group flex items-center justify-between gap-3 rounded-xl p-2.5 text-left transition hover:bg-indigo-50/50 active:bg-indigo-100/60 border border-transparent hover:border-indigo-100">
                                 <div class="flex items-center gap-3 min-w-0">
                                     <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white shadow-xs transition">
@@ -178,7 +180,8 @@
 
                     <div class="mt-1 space-y-1">
                         @foreach ($matchedJournals as $journal)
-                            <a href="{{ route('journal', ['highlight' => $journal->id]) }}"
+                            <a wire:key="search-journal-{{ $journal->id }}"
+                               href="{{ route('journal', ['highlight' => $journal->id]) }}"
                                wire:click.prevent="selectJournal({{ $journal->id }})"
                                class="group flex flex-col gap-1 rounded-xl p-3 text-left transition hover:bg-cyan-50/40 active:bg-cyan-50/70 border border-transparent hover:border-cyan-100/60">
                                 <div class="flex items-center justify-between gap-2">

@@ -86,7 +86,7 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @foreach ($students as $student)
-                            <tr class="hover:bg-gray-50/50 transition-colors">
+                            <tr wire:key="student-row-{{ $student['id'] }}" class="hover:bg-gray-50/50 transition-colors">
                                 <td class="py-4 px-6 flex items-center gap-3">
                                     <img src="{{ $student['avatar_url'] }}" alt="" class="w-9 h-9 rounded-full object-cover shrink-0 ring-1 ring-gray-100">
                                     <div>

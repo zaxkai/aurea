@@ -67,7 +67,7 @@
                 <div class="space-y-3 mb-5">
                     <div class="text-xs font-bold text-gray-500 uppercase tracking-wider">Kelas yang kamu ikuti:</div>
                     @foreach ($enrolledClasses as $enrolled)
-                        <div class="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl border border-gray-100">
+                        <div wire:key="enrolled-class-{{ $enrolled->id }}" class="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl border border-gray-100">
                             <div>
                                 <div class="font-bold text-sm text-navy">{{ $enrolled->name }}</div>
                                 <div class="text-xs text-gray-500">Guru: {{ $enrolled->teacher?->name ?? 'Guru' }} &bull; Kode: {{ $enrolled->code }}</div>

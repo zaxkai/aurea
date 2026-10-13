@@ -11,6 +11,14 @@ class OnboardingQuestion extends Model
 
     protected $fillable = ['key', 'question', 'order', 'is_active'];
 
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'order' => 'integer',
+        ];
+    }
+
     public function options()
     {
         return $this->hasMany(OnboardingOption::class, 'question_id');

@@ -64,6 +64,7 @@
                             $isActive = ($todayMood === $key);
                         @endphp
                         <button type="button"
+                                wire:key="mood-pill-{{ $key }}"
                                 wire:click="checkIn('{{ $key }}')"
                                 class="min-w-[126px] px-4 py-2.5 rounded-full font-semibold text-sm flex items-center justify-center gap-2.5 transition-all duration-200 shrink-0 border {{ $isActive ? ($mood['active_class'] ?? 'bg-white border-navy text-navy font-bold ring-2 ring-navy/20 shadow-sm scale-105') : ($mood['idle_class'] ?? 'bg-white text-gray-700 border-gray-200 shadow-2xs hover:bg-gray-50') }}">
                             <div class="w-6 h-6 rounded-full bg-white/90 p-0.5 shadow-2xs flex items-center justify-center overflow-hidden shrink-0">
@@ -319,7 +320,8 @@
 
                 <div class="grid grid-cols-7 gap-px overflow-hidden rounded-xl border border-navy bg-navy">
                     @foreach ($calendarDays as $day)
-                        <div class="relative flex aspect-square items-center justify-center text-[10px] font-medium {{ $day['color_class'] }} {{ $day['is_current_month'] ? 'text-navy' : 'text-gray-300' }} {{ $day['is_today'] ? 'z-10 ring-2 ring-inset ring-navy' : '' }}"
+                        <div wire:key="cal-day-{{ $day['date']->format('Y-m-d') }}"
+                             class="relative flex aspect-square items-center justify-center text-[10px] font-medium {{ $day['color_class'] }} {{ $day['is_current_month'] ? 'text-navy' : 'text-gray-300' }} {{ $day['is_today'] ? 'z-10 ring-2 ring-inset ring-navy' : '' }}"
                              title="{{ $day['date']->format('d M Y') }} - {{ $day['mood'] ?? 'No log' }}">
                             {{ $day['date']->day }}
                         </div>
@@ -465,6 +467,7 @@
                         <div class="flex gap-2 flex-wrap">
                             @foreach ($moods as $key => $mood)
                                 <button type="button"
+                                        wire:key="modal-mood-{{ $key }}"
                                         @click="mood = '{{ $key }}'; $wire.set('todayMood', '{{ $key }}', false)"
                                         class="px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 border transition-all"
                                         :class="mood === '{{ $key }}' ? '{{ $mood['active_class'] ?? '' }}' : '{{ $mood['idle_class'] ?? '' }}'">

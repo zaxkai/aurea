@@ -91,7 +91,8 @@ new class extends Component {
         {{-- Notifications List --}}
         <div class="max-h-[60vh] overflow-y-auto overscroll-contain">
             @forelse($notifications as $notification)
-                <div class="relative flex gap-4 px-5 py-4 hover:bg-gray-50 transition border-b border-gray-50 last:border-0 {{ $notification->unread() ? 'bg-blue-50/30' : '' }}"
+                <div wire:key="notif-item-{{ $notification->id }}"
+                     class="relative flex gap-4 px-5 py-4 hover:bg-gray-50 transition border-b border-gray-50 last:border-0 {{ $notification->unread() ? 'bg-blue-50/30' : '' }}"
                      wire:click="markAsRead('{{ $notification->id }}')" 
                      style="cursor: pointer;">
                     

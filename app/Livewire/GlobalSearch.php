@@ -165,11 +165,18 @@ class GlobalSearch extends Component
         return redirect()->route($routeName);
     }
 
-    public function selectStudent(string $studentName): mixed
+    public function selectStudent(int|string $student): mixed
     {
         $this->resetSearch();
 
-        return redirect()->route('teacher.students', ['search' => $studentName]);
+        if (is_numeric($student)) {
+            $user = User::find($student);
+            $search = $user ? $user->name : '';
+        } else {
+            $search = $student;
+        }
+
+        return redirect()->route('teacher.students', ['search' => $search]);
     }
 
     public function selectJournal(int $journalId): mixed
