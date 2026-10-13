@@ -277,19 +277,52 @@ class Dashboard extends Component
         $user->save();
     }
 
+    public function incrementHabit(int $habitId): void
+    {
+        $habit = auth()->user()->habits()->findOrFail($habitId);
+        $log = $habit->logs()->firstOrNew(['log_date' => today()]);
+
+        if ($habit->type === 'checklist' || $habit->target_value <= 1) {
+            $log->value_logged = ($log->value_logged ?? 0) >= $habit->target_value ? 0 : $habit->target_value;
+        } else {
+            $step = max(1, (int) round($habit->target_value / 4));
+            $current = $log->value_logged ?? 0;
+            $log->value_logged = min($habit->target_value, $current + $step);
+        }
+
+        $log->save();
+    }
+
+    public function decrementHabit(int $habitId): void
+    {
+        $habit = auth()->user()->habits()->findOrFail($habitId);
+        $log = $habit->logs()->firstOrNew(['log_date' => today()]);
+
+        if ($habit->type === 'checklist' || $habit->target_value <= 1) {
+            $log->value_logged = 0;
+        } else {
+            $step = max(1, (int) round($habit->target_value / 4));
+            $current = $log->value_logged ?? 0;
+            $log->value_logged = max(0, $current - $step);
+        }
+
+        $log->save();
+    }
+
     public function toggleHabit(int $habitId): void
     {
         $habit = auth()->user()->habits()->findOrFail($habitId);
         $log = $habit->logs()->firstOrNew(['log_date' => today()]);
 
-        if ($habit->type === 'checklist') {
+        if ($habit->type === 'checklist' || $habit->target_value <= 1) {
             $log->value_logged = ($log->value_logged ?? 0) >= $habit->target_value ? 0 : $habit->target_value;
         } else {
-            $increment = max(1, (int) round($habit->target_value / 4));
-            if (($log->value_logged ?? 0) >= $habit->target_value) {
+            $step = max(1, (int) round($habit->target_value / 4));
+            $current = $log->value_logged ?? 0;
+            if ($current >= $habit->target_value) {
                 $log->value_logged = 0;
             } else {
-                $log->value_logged = min($habit->target_value, ($log->value_logged ?? 0) + $increment);
+                $log->value_logged = min($habit->target_value, $current + $step);
             }
         }
 

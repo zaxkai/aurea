@@ -234,6 +234,74 @@ it('can toggle checklist habit and update value', function () {
         ->and($log->value_logged)->toBe(1);
 });
 
+it('increments progress habit without resetting to zero when reaching target', function () {
+    $user = User::factory()->create();
+
+    $habit = Habit::create([
+        'user_id' => $user->id,
+        'name' => 'Wind down without screens',
+        'type' => 'progress',
+        'target_value' => 20,
+        'unit' => 'minutes',
+        'is_active' => true,
+    ]);
+
+    $component = Livewire::actingAs($user)
+        ->test(Dashboard::class)
+        ->call('incrementHabit', $habit->id); // 0 -> 5
+
+    $log = $habit->logs()->where('log_date', today())->first();
+    expect($log->value_logged)->toBe(5);
+
+    // Call 3 more times to reach 20
+    $component->call('incrementHabit', $habit->id) // 5 -> 10
+        ->call('incrementHabit', $habit->id) // 10 -> 15
+        ->call('incrementHabit', $habit->id); // 15 -> 20
+
+    $log->refresh();
+    expect($log->value_logged)->toBe(20);
+
+    // Calling again must stay at 20 (must NEVER reset to zero)
+    $component->call('incrementHabit', $habit->id);
+    $log->refresh();
+    expect($log->value_logged)->toBe(20);
+});
+
+it('decrements progress habit and floors at zero', function () {
+    $user = User::factory()->create();
+
+    $habit = Habit::create([
+        'user_id' => $user->id,
+        'name' => 'Wind down without screens',
+        'type' => 'progress',
+        'target_value' => 20,
+        'unit' => 'minutes',
+        'is_active' => true,
+    ]);
+
+    HabitLog::create([
+        'habit_id' => $habit->id,
+        'log_date' => today(),
+        'value_logged' => 20,
+    ]);
+
+    $component = Livewire::actingAs($user)
+        ->test(Dashboard::class)
+        ->call('decrementHabit', $habit->id); // 20 -> 15
+
+    $log = $habit->logs()->where('log_date', today())->first();
+    expect($log->value_logged)->toBe(15);
+
+    // Decrement repeatedly until 0
+    $component->call('decrementHabit', $habit->id) // 15 -> 10
+        ->call('decrementHabit', $habit->id) // 10 -> 5
+        ->call('decrementHabit', $habit->id) // 5 -> 0
+        ->call('decrementHabit', $habit->id); // must remain 0, never negative
+
+    $log->refresh();
+    expect($log->value_logged)->toBe(0);
+});
+
 it('shows a young tree and keeps daily goal progress at one hundred percent when all goals are complete', function () {
     $user = User::factory()->create([
         'onboarding_completed_at' => now(),

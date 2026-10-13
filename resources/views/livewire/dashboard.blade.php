@@ -140,7 +140,7 @@
                                 <div wire:key="checklist-habit-{{ $habit->id }}"
                                      x-data="{ done: @js($isDone) }"
                                      @click="done = !done"
-                                     wire:click="toggleHabit({{ $habit->id }})"
+                                     wire:click.throttle.300ms="toggleHabit({{ $habit->id }})"
                                      wire:loading.class="opacity-75"
                                      wire:target="toggleHabit({{ $habit->id }})"
                                      class="flex items-center justify-between px-4 py-3 rounded-2xl bg-gray-50/80 border border-gray-100 hover:bg-gray-100/70 transition cursor-pointer select-none group">
@@ -195,45 +195,71 @@
                                     $currentVal = $log->value_logged ?? 0;
                                     $percent = min(100, (int) round(($currentVal / $habit->target_value) * 100));
                                     $isFull = $percent >= 100;
-                                    $increment = max(1, (int) round($habit->target_value / 4));
+                                    $isSingleStep = $habit->target_value <= 1;
                                 @endphp
-                                <div wire:key="progress-habit-{{ $habit->id }}"
-                                     x-data="{
-                                         current: @js($currentVal),
-                                         target: @js($habit->target_value),
-                                         inc: @js($increment),
-                                         addProgress() {
-                                             if (this.current >= this.target) {
-                                                 this.current = 0;
-                                             } else {
-                                                 this.current = Math.min(this.target, this.current + this.inc);
-                                             }
-                                         }
-                                     }"
-                                     class="group">
+                                <div wire:key="progress-habit-{{ $habit->id }}" class="group">
                                     <div class="flex items-center justify-between text-xs mb-1.5">
                                         <div>
                                             <p class="font-semibold text-navy">{{ $habit->name }}</p>
                                             <p class="text-[11px] text-gray-400 mt-0.5">
-                                                <span x-text="current">{{ $currentVal }}</span>/{{ $habit->target_value }} {{ $habit->unit }}
+                                                {{ $currentVal }}/{{ $habit->target_value }} {{ $habit->unit }}
                                             </p>
                                         </div>
-                                        <div class="flex items-center gap-2">
-                                            <button type="button"
-                                                    @click="addProgress()"
-                                                    wire:click="toggleHabit({{ $habit->id }})"
-                                                    wire:loading.attr="disabled"
-                                                    wire:target="toggleHabit({{ $habit->id }})"
-                                                    class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0 active:scale-90 {{ $isFull ? 'bg-navy border-navy text-white' : 'border-gray-300 hover:border-navy' }}"
-                                                    :class="current >= target ? 'bg-navy border-navy text-white shadow-sm' : 'border-gray-300 hover:border-navy bg-white'"
-                                                    title="{{ __('Add progress') }}">
-                                                <span x-show="current < target" style="{{ $isFull ? 'display: none;' : '' }}" class="text-[10px] text-gray-400 font-bold group-hover:text-navy">+</span>
-                                                <svg x-show="current >= target" style="{{ $isFull ? '' : 'display: none;' }}" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                            </button>
+                                        <div class="flex items-center gap-1.5">
+                                            @if ($isSingleStep)
+                                                {{-- Single-step habit: toggle complete/uncomplete --}}
+                                                <button type="button"
+                                                        wire:click.throttle.300ms="toggleHabit({{ $habit->id }})"
+                                                        wire:loading.attr="disabled"
+                                                        wire:target="toggleHabit({{ $habit->id }})"
+                                                        class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0 active:scale-90 {{ $isFull ? 'bg-navy border-navy text-white shadow-sm' : 'border-gray-300 hover:border-navy bg-white' }}"
+                                                        title="{{ $isFull ? __('Mark incomplete') : __('Mark complete') }}">
+                                                    @if ($isFull)
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                    @endif
+                                                </button>
+                                            @else
+                                                {{-- Multi-step progress habit: - and + buttons --}}
+                                                @if ($currentVal > 0)
+                                                    <button type="button"
+                                                            wire:click.throttle.300ms="decrementHabit({{ $habit->id }})"
+                                                            wire:loading.attr="disabled"
+                                                            wire:target="decrementHabit({{ $habit->id }})"
+                                                            class="w-6 h-6 rounded-full border border-gray-300 bg-white text-gray-600 hover:border-navy hover:text-navy flex items-center justify-center transition shrink-0 active:scale-90 shadow-2xs"
+                                                            title="{{ __('Reduce progress') }}">
+                                                        <span class="text-xs font-bold leading-none mb-0.5">-</span>
+                                                    </button>
+                                                @endif
+
+                                                @if ($isFull)
+                                                    <div class="w-6 h-6 rounded-full bg-navy border-2 border-navy text-white flex items-center justify-center shadow-sm shrink-0"
+                                                         title="{{ __('Goal completed') }}">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                    </div>
+                                                @else
+                                                    <button type="button"
+                                                            wire:click.throttle.300ms="incrementHabit({{ $habit->id }})"
+                                                            wire:loading.attr="disabled"
+                                                            wire:target="incrementHabit({{ $habit->id }})"
+                                                            class="w-6 h-6 rounded-full border-2 border-gray-300 hover:border-navy bg-white text-navy flex items-center justify-center transition shrink-0 active:scale-90 hover:shadow-xs"
+                                                            title="{{ __('Add progress') }}">
+                                                        <span class="text-xs font-bold leading-none mb-0.5 text-navy">+</span>
+                                                    </button>
+                                                @endif
+                                            @endif
+
                                             @if ($habit->source === 'user')
-                                                <button type="button" wire:click="removeCustomHabit({{ $habit->id }})" wire:loading.attr="disabled" wire:target="removeCustomHabit({{ $habit->id }})" title="{{ __('Disable habit') }}" aria-label="{{ __('Disable') }} {{ $habit->name }}" class="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-rose-50 hover:text-rose-600">
+                                                <button type="button"
+                                                        wire:click="removeCustomHabit({{ $habit->id }})"
+                                                        wire:loading.attr="disabled"
+                                                        wire:target="removeCustomHabit({{ $habit->id }})"
+                                                        title="{{ __('Disable habit') }}"
+                                                        aria-label="{{ __('Disable') }} {{ $habit->name }}"
+                                                        class="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-rose-50 hover:text-rose-600">
                                                     <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M5 7l1 13h12l1-13M9 7V4h6v3" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" /></svg>
                                                 </button>
                                             @endif
@@ -241,7 +267,6 @@
                                     </div>
                                     <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
                                         <div class="bg-navy h-2 rounded-full transition-all duration-300"
-                                             :style="'width: ' + Math.min(100, Math.round((current / target) * 100)) + '%'"
                                              style="width: {{ $percent }}%"></div>
                                     </div>
                                 </div>
