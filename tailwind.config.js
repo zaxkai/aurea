@@ -31,7 +31,7 @@ export default {
             colors: {
                 navy: '#000F2E',
                 aurea: '#2EE0E0',
-                bg: '#F2F3F8',
+                bg: 'var(--bg, #F2F3F8)',
                 mood: {
                     energetic: '#D6E64C', // lime
                     calm: '#F072C0',      // light pink/magenta
@@ -39,6 +39,32 @@ export default {
                     stressed: '#F43F72',  // hot pink
                     exhausted: '#33C6D9', // cyan
                 },
+                main: 'var(--main)',
+                overlay: 'var(--overlay)',
+                bw: 'var(--bw)',
+                blank: 'var(--blank)',
+                text: 'var(--text)',
+                mtext: 'var(--mtext)',
+                border: 'var(--border)',
+                ring: 'var(--ring)',
+                ringOffset: 'var(--ring-offset)',
+                secondaryBlack: '#212121',
+            },
+            borderRadius: {
+                base: '5px',
+            },
+            boxShadow: {
+                shadow: 'var(--shadow)',
+            },
+            translate: {
+                boxShadowX: '4px',
+                boxShadowY: '4px',
+                reverseBoxShadowX: '-4px',
+                reverseBoxShadowY: '-4px',
+            },
+            fontWeight: {
+                base: '500',
+                heading: '700',
             },
         },
     },

@@ -3,7 +3,7 @@
 <div
     class="growth-tree relative {{ $compact ? 'h-40 w-full max-w-36' : 'h-80 w-full max-w-sm' }}"
     role="img"
-    aria-label="Pohon Aurea tahap {{ $stage + 1 }}"
+    aria-label="Aurea Tree stage {{ $stage + 1 }}"
 >
     <img
         src="{{ asset('images/habit-growth-tree/pohon'.$stage.'.png') }}"

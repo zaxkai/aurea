@@ -98,9 +98,9 @@ new #[Layout('layouts.empty')] class extends Component
                 </div>
 
                 {{-- Next Button --}}
-                <button wire:click="next" class="rounded-full bg-[#001033] px-16 py-3 text-sm font-medium text-white transition-colors hover:bg-[#162040]">
+                <x-ui.button wire:click="next" size="lg" class="px-16 text-base font-semibold">
                     Next
-                </button>
+                </x-ui.button>
             </div>
 
         @else
@@ -158,30 +158,33 @@ new #[Layout('layouts.empty')] class extends Component
 
                 {{-- Right Panel: options --}}
                 <div class="relative flex w-full flex-col justify-center bg-[#001033] px-5 py-7 md:min-h-0 md:w-[55%] md:overflow-y-auto md:rounded-l-[12px] md:px-10 md:py-8 lg:px-14">
-                    <div class="space-y-2.5 w-full max-w-md mx-auto">
+                    <div class="space-y-3 w-full max-w-md mx-auto">
                         @foreach($currentQuestion->options as $option)
                             @php $isSelected = ($answers[$currentQuestion->id] ?? null) == $option->id; @endphp
-                            <button wire:click="selectOption({{ $currentQuestion->id }}, {{ $option->id }})"
-                                    wire:key="option-{{ $option->id }}"
-                                    class="w-full text-center py-2.5 px-5 rounded-xl font-medium text-[13px] transition-all duration-200
-                                    @if($isSelected) bg-white text-[#001033] shadow-lg scale-[1.02]
-                                    @else bg-[#303C5B] text-white/95 hover:bg-[#3B496C] @endif">
+                            <x-ui.tactile-button
+                                wire:click="selectOption({{ $currentQuestion->id }}, {{ $option->id }})"
+                                wire:key="option-{{ $option->id }}"
+                                :selected="$isSelected"
+                            >
                                 {{ $option->label }}
-                            </button>
+                            </x-ui.tactile-button>
                         @endforeach
                     </div>
 
                     {{-- Next / Finish button --}}
-                    <div class="mx-auto mt-5 flex w-full max-w-md justify-end md:mt-4">
-                        <button wire:click="next"
-                                @if(!isset($answers[$currentQuestion->id])) disabled @endif
-                                class="rounded-xl bg-[#29D5D7] px-8 py-2.5 text-sm font-medium text-[#001033] transition-all duration-200 hover:bg-[#45dfe0] disabled:cursor-not-allowed disabled:opacity-40">
+                    <div class="mx-auto mt-6 flex w-full max-w-md justify-end md:mt-5">
+                        <x-ui.button
+                            wire:click="next"
+                            :disabled="!isset($answers[$currentQuestion->id])"
+                            size="lg"
+                            class="px-8 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+                        >
                             @if($step == $questions->count())
                                 Finish
                             @else
                                 Next
                             @endif
-                        </button>
+                        </x-ui.button>
                     </div>
                 </div>
             </div>

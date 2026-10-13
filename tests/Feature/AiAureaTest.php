@@ -149,9 +149,9 @@ it('blocks free users at five prompts before sending another Gemini request', fu
         ->test(AiAurea::class)
         ->set('message', 'Pesan keenam')
         ->call('sendMessage')
-        ->assertSee('Sisa 0 dari 5 chat hari ini')
-        ->assertSee('Kuota chat hari ini sudah habis')
-        ->assertSee('Buka Premium');
+        ->assertSee('0 of 5 chats remaining today')
+        ->assertSee('chat limit has been reached')
+        ->assertSee('Unlock Premium');
 
     expect($requestCount)->toBe(0);
     expect($user->chatSessions()->count())->toBe(0);
@@ -206,7 +206,7 @@ it('allows premium users unlimited prompts without showing a counter', function 
     }
 
     $chat->assertSee('Premium')
-        ->assertDontSee('Sisa 5 dari 5 chat hari ini');
+        ->assertDontSee('5 of 5 chats remaining today');
 
     expect($user->chatSessions()->sole()->messages()->where('role', 'user')->count())->toBe(6)
         ->and($user->aiUsageLogs()->count())->toBe(0);

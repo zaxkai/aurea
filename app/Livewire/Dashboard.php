@@ -18,6 +18,9 @@ class Dashboard extends Component
         'energetic' => [
             'label' => 'Energetic',
             'emoji' => '😄',
+            'mascot' => 'maskot-journal2.png',
+            'active_class' => 'bg-[#EAF67A] text-navy border-[#A3BA0D] ring-2 ring-lime-400/30 scale-105 shadow-sm font-bold',
+            'idle_class' => 'bg-white text-gray-700 border-gray-200/90 hover:bg-lime-50/70 hover:border-lime-300 hover:text-lime-950 shadow-2xs',
             'bg' => 'bg-mood-energetic',
             'text' => 'text-gray-900',
             'border' => 'border-mood-energetic',
@@ -25,6 +28,9 @@ class Dashboard extends Component
         'calm' => [
             'label' => 'Calm',
             'emoji' => '😌',
+            'mascot' => 'maskot-journal3.png',
+            'active_class' => 'bg-[#FBCFE8] text-pink-950 border-pink-400 ring-2 ring-pink-400/30 scale-105 shadow-sm font-bold',
+            'idle_class' => 'bg-white text-gray-700 border-gray-200/90 hover:bg-pink-50/70 hover:border-pink-300 hover:text-pink-950 shadow-2xs',
             'bg' => 'bg-mood-calm',
             'text' => 'text-white',
             'border' => 'border-mood-calm',
@@ -32,6 +38,9 @@ class Dashboard extends Component
         'neutral' => [
             'label' => 'Neutral',
             'emoji' => '😐',
+            'mascot' => 'maskot-journal3.png',
+            'active_class' => 'bg-[#A7F3D0] text-emerald-950 border-emerald-400 ring-2 ring-emerald-400/30 scale-105 shadow-sm font-bold',
+            'idle_class' => 'bg-white text-gray-700 border-gray-200/90 hover:bg-emerald-50/70 hover:border-emerald-300 hover:text-emerald-950 shadow-2xs',
             'bg' => 'bg-mood-neutral',
             'text' => 'text-white',
             'border' => 'border-mood-neutral',
@@ -39,6 +48,9 @@ class Dashboard extends Component
         'stressed' => [
             'label' => 'Stressed',
             'emoji' => '😣',
+            'mascot' => 'maskot-journal1.png',
+            'active_class' => 'bg-[#FECDD3] text-rose-950 border-rose-400 ring-2 ring-rose-400/30 scale-105 shadow-sm font-bold',
+            'idle_class' => 'bg-white text-gray-700 border-gray-200/90 hover:bg-rose-50/70 hover:border-rose-300 hover:text-rose-950 shadow-2xs',
             'bg' => 'bg-mood-stressed',
             'text' => 'text-white',
             'border' => 'border-mood-stressed',
@@ -46,6 +58,9 @@ class Dashboard extends Component
         'exhausted' => [
             'label' => 'Exhausted',
             'emoji' => '😩',
+            'mascot' => 'maskot-journal4.png',
+            'active_class' => 'bg-[#BAE6FD] text-cyan-950 border-cyan-400 ring-2 ring-cyan-400/30 scale-105 shadow-sm font-bold',
+            'idle_class' => 'bg-white text-gray-700 border-gray-200/90 hover:bg-cyan-50/70 hover:border-cyan-300 hover:text-cyan-950 shadow-2xs',
             'bg' => 'bg-mood-exhausted',
             'text' => 'text-white',
             'border' => 'border-mood-exhausted',

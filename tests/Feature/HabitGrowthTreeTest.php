@@ -22,7 +22,7 @@ it('shows the matching tree stage as the user completes tasks', function (int $c
     $response
         ->assertSee(asset("images/habit-growth-tree/{$image}"), false)
         ->assertSee((string) $completedTasks)
-        ->assertSee('target selesai');
+        ->assertSee('targets completed');
 
     if ($completedTasks >= 3) {
         $response->assertSee('tree-leaf', false);
@@ -53,7 +53,7 @@ it('does not grow the tree for unfinished tasks', function () {
     $response
         ->assertSee(asset('images/habit-growth-tree/pohon0.png'), false)
         ->assertSee('0')
-        ->assertSee('target selesai')
+        ->assertSee('targets completed')
         ->assertDontSee('tree-leaf', false);
 });
 
@@ -81,7 +81,7 @@ it('grows the tree when active habits reach their daily target', function () {
         ->get(route('habit-growth-tree'))
         ->assertSee(asset('images/habit-growth-tree/pohon2.png'), false)
         ->assertSee('4')
-        ->assertSee('target selesai');
+        ->assertSee('targets completed');
 });
 
 it('does not count inactive or unfinished habits toward the tree stage', function () {
@@ -117,7 +117,7 @@ it('does not count inactive or unfinished habits toward the tree stage', functio
         ->get(route('habit-growth-tree'))
         ->assertSee(asset('images/habit-growth-tree/pohon0.png'), false)
         ->assertSee('0')
-        ->assertSee('target selesai');
+        ->assertSee('targets completed');
 });
 
 it('uses the same task-based tree stage in the dashboard preview', function () {

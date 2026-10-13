@@ -138,8 +138,10 @@
                             <legend class="mb-2 text-base font-medium text-navy">I have been feeling...</legend>
                             <div class="flex flex-wrap justify-center gap-2">
                                 @foreach ($moods as $key => $moodOption)
-                                    <button type="button" wire:click="$set('mood', '{{ $key }}')" aria-pressed="{{ $mood === $key ? 'true' : 'false' }}" class="inline-flex min-h-9 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold text-navy transition hover:brightness-95 {{ $moodOption['background'] }} {{ $mood === $key ? 'ring-2 ring-navy ring-offset-2' : '' }}">
-                                        <span aria-hidden="true">{{ $moodOption['emoji'] }}</span>
+                                    <button type="button" wire:click="$set('mood', '{{ $key }}')" aria-pressed="{{ $mood === $key ? 'true' : 'false' }}" class="inline-flex min-h-9 items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-navy transition hover:brightness-95 {{ $moodOption['background'] }} {{ $mood === $key ? 'ring-2 ring-navy ring-offset-2' : '' }}">
+                                        <div class="w-4 h-4 rounded-full bg-white/90 p-0.5 flex items-center justify-center overflow-hidden shrink-0">
+                                            <img src="{{ asset('images/journal/' . $moodOption['mascot']) }}" alt="" class="w-full h-full object-contain">
+                                        </div>
                                         {{ $moodOption['label'] }}
                                     </button>
                                 @endforeach

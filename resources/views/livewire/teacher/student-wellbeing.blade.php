@@ -100,7 +100,16 @@
                                     </span>
                                 </td>
                                 <td class="py-4 px-4 font-bold text-[#000F2E]">
-                                    {{ $student['latest_mood_emoji'] }}
+                                    @if ($student['latest_mood_mascot'])
+                                        <div class="inline-flex items-center gap-2">
+                                            <div class="w-6 h-6 rounded-full {{ $student['latest_mood_color'] }} p-0.5 flex items-center justify-center shrink-0 shadow-2xs border border-black/5">
+                                                <img src="{{ asset('images/journal/' . $student['latest_mood_mascot']) }}" alt="{{ $student['latest_mood_label'] }}" class="w-full h-full object-contain">
+                                            </div>
+                                            <span>{{ $student['latest_mood_label'] }}</span>
+                                        </div>
+                                    @else
+                                        <span class="text-gray-400 font-medium text-xs">— {{ $student['latest_mood_label'] }}</span>
+                                    @endif
                                 </td>
                                 <td class="py-4 px-4">
                                     <div class="flex items-center gap-2">
@@ -116,12 +125,12 @@
                                 <td class="py-4 px-4">
                                     @if ($student['needs_attention'])
                                         <span class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200/80 px-2.5 py-1 rounded-xl text-[11px] font-bold">
-                                            <span>⚠️</span>
+                                            <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                             <span>Need Attention</span>
                                         </span>
                                     @else
                                         <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-2.5 py-1 rounded-xl text-[11px] font-bold">
-                                            <span>🌱</span>
+                                            <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                             <span>Healthy</span>
                                         </span>
                                     @endif

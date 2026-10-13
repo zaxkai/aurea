@@ -59,10 +59,17 @@
             <!-- Mood Selector Pills (Row of 5) -->
             <div class="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
                 @foreach ($moods as $key => $mood)
+                    @php
+                        $isActive = ($todayMood === $key);
+                    @endphp
                     <button type="button"
                             wire:click="checkIn('{{ $key }}')"
-                            class="min-w-[120px] px-5 py-2.5 rounded-full {{ $mood['bg'] }} {{ $mood['text'] }} font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-150 shrink-0 shadow-sm hover:opacity-95 hover:scale-[1.02] active:scale-95 {{ $todayMood === $key ? 'ring-4 ring-navy ring-offset-2 ring-offset-bg shadow-md' : 'opacity-90' }}">
-                        <span class="text-base">{{ $mood['emoji'] }}</span>
+                            class="min-w-[124px] px-4 py-2.5 rounded-full font-semibold text-sm flex items-center justify-center gap-2.5 transition-all duration-200 shrink-0 border {{ $isActive ? ($mood['active_class'] ?? 'bg-white border-navy text-navy font-bold ring-2 ring-navy/20 shadow-sm scale-105') : ($mood['idle_class'] ?? 'bg-white text-gray-700 border-gray-200 shadow-2xs hover:bg-gray-50') }}">
+                        <div class="w-6 h-6 rounded-full bg-white/90 p-0.5 shadow-2xs flex items-center justify-center overflow-hidden shrink-0">
+                            <img src="{{ asset('images/journal/' . ($mood['mascot'] ?? 'maskot-journal3.png')) }}"
+                                 alt="{{ $mood['label'] }}"
+                                 class="w-full h-full object-contain">
+                        </div>
                         <span>{{ $mood['label'] }}</span>
                     </button>
                 @endforeach
@@ -270,10 +277,10 @@
             </section>
 
             @if (auth()->user()->isPremium())
-                <div aria-label="Premium Aktif" class="flex aspect-[412/668] flex-col items-center justify-center gap-4 rounded-3xl bg-[#e0e8ff] px-4 text-center">
+                <div aria-label="Premium Active" class="flex aspect-[412/668] flex-col items-center justify-center gap-4 rounded-3xl bg-[#e0e8ff] px-4 text-center">
                     <img src="{{ asset('images/logo_aurea.png') }}" alt="AUREA" class="h-9 w-28 object-contain">
-                    <span class="rounded-full bg-[#00bfc3] px-5 py-3 text-sm font-semibold text-white">Premium Aktif</span>
-                    <p class="max-w-[190px] text-xs leading-snug text-navy">Semua ruang untuk berkembang kini terbuka untukmu.</p>
+                    <span class="rounded-full bg-[#00bfc3] px-5 py-3 text-sm font-semibold text-white">Premium Active</span>
+                    <p class="max-w-[190px] text-xs leading-snug text-navy">All spaces to grow are now open for you.</p>
                 </div>
             @else
                 <div class="relative isolate block aspect-[412/668] overflow-hidden rounded-3xl bg-[#e0e8ff] text-center">
@@ -281,14 +288,14 @@
                         <img src="{{ asset('images/logo_aurea.png') }}" alt="AUREA" class="h-9 w-28 object-contain">
                         <h3 class="mt-1 text-3xl font-bold leading-tight text-navy">Premium</h3>
                         <p class="mt-3 max-w-[190px] text-xs leading-snug text-navy">
-                            Buka lebih banyak fitur,<br>
-                            capai tujuanmu dan<br>
-                            jadi versi terbaik dirimu.
+                            Unlock more features,<br>
+                            reach your goals, and<br>
+                            become your best self.
                         </p>
                         <form method="POST" action="{{ route('premium.activate') }}" class="mt-5">
                             @csrf
                             <button type="submit" class="inline-flex items-center gap-1 rounded-full bg-navy px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#183a69] focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2">
-                                Buka Premium
+                                Unlock Premium
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 18 6-6-6-6" />
                                 </svg>
@@ -308,35 +315,35 @@
             <section role="dialog" aria-modal="true" aria-labelledby="add-habit-title" class="my-auto w-full max-w-md rounded-2xl border border-gray-100 bg-white p-5 shadow-2xl sm:p-6">
                 <div class="mb-5 flex items-start justify-between gap-4">
                     <div>
-                        <h2 id="add-habit-title" class="text-lg font-bold text-navy">Tambah habit pilihan</h2>
-                        <p class="mt-1 text-xs text-gray-500">Tambahkan kebiasaan sesuai kebutuhanmu.</p>
+                        <h2 id="add-habit-title" class="text-lg font-bold text-navy">Add custom habit</h2>
+                        <p class="mt-1 text-xs text-gray-500">Add habits tailored to your personal goals.</p>
                     </div>
-                    <button type="button" wire:click="closeAddHabitModal" aria-label="Tutup" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-navy">
+                    <button type="button" wire:click="closeAddHabitModal" aria-label="Close" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-navy">
                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
                     </button>
                 </div>
 
                 <form wire:submit="addCustomHabit" class="space-y-4">
                     <div>
-                        <label for="custom-habit-name" class="mb-1.5 block text-xs font-semibold text-navy">Nama habit</label>
-                        <input id="custom-habit-name" type="text" maxlength="80" wire:model="customHabitName" placeholder="Contoh: Membaca selama 15 menit" class="w-full rounded-xl border-gray-200 text-sm text-navy placeholder:text-gray-400 focus:border-aurea focus:ring-aurea">
+                        <label for="custom-habit-name" class="mb-1.5 block text-xs font-semibold text-navy">Habit name</label>
+                        <input id="custom-habit-name" type="text" maxlength="80" wire:model="customHabitName" placeholder="e.g. Read for 15 minutes" class="w-full rounded-xl border-gray-200 text-sm text-navy placeholder:text-gray-400 focus:border-aurea focus:ring-aurea">
                         @error('customHabitName') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label for="custom-habit-target" class="mb-1.5 block text-xs font-semibold text-navy">Target harian</label>
+                            <label for="custom-habit-target" class="mb-1.5 block text-xs font-semibold text-navy">Daily target</label>
                             <input id="custom-habit-target" type="number" min="1" max="10000" wire:model="customHabitTarget" class="w-full rounded-xl border-gray-200 text-sm text-navy focus:border-aurea focus:ring-aurea">
                             @error('customHabitTarget') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label for="custom-habit-unit" class="mb-1.5 block text-xs font-semibold text-navy">Satuan</label>
-                            <input id="custom-habit-unit" type="text" maxlength="24" wire:model="customHabitUnit" placeholder="menit" class="w-full rounded-xl border-gray-200 text-sm text-navy placeholder:text-gray-400 focus:border-aurea focus:ring-aurea">
+                            <label for="custom-habit-unit" class="mb-1.5 block text-xs font-semibold text-navy">Unit</label>
+                            <input id="custom-habit-unit" type="text" maxlength="24" wire:model="customHabitUnit" placeholder="minutes / times" class="w-full rounded-xl border-gray-200 text-sm text-navy placeholder:text-gray-400 focus:border-aurea focus:ring-aurea">
                             @error('customHabitUnit') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                         </div>
                     </div>
                     <div class="flex justify-end gap-2 pt-2">
-                        <button type="button" wire:click="closeAddHabitModal" class="min-h-10 rounded-xl px-4 text-sm font-semibold text-gray-500 transition hover:bg-gray-100">Batal</button>
-                        <button type="submit" class="min-h-10 rounded-xl bg-navy px-5 text-sm font-semibold text-white transition hover:bg-navy/90">Tambah habit</button>
+                        <button type="button" wire:click="closeAddHabitModal" class="min-h-10 rounded-xl px-4 text-sm font-semibold text-gray-500 transition hover:bg-gray-100">Cancel</button>
+                        <button type="submit" class="min-h-10 rounded-xl bg-navy px-5 text-sm font-semibold text-white transition hover:bg-navy/90">Add habit</button>
                     </div>
                 </form>
             </section>
@@ -348,12 +355,12 @@
             <section role="dialog" aria-modal="true" aria-labelledby="habit-upgrade-title" class="my-auto w-full max-w-md rounded-2xl border border-gray-100 bg-white p-5 shadow-2xl sm:p-6">
                 <div class="flex flex-col items-center gap-4 text-center">
                     <div>
-                        <h2 id="habit-upgrade-title" class="text-lg font-bold text-navy">Habit Free kamu sudah penuh</h2>
-                        <p class="mt-2 text-sm leading-relaxed text-gray-600">Kamu sudah memakai {{ $freeHabitLimit }} habit. Buka Premium untuk habit tanpa batas.</p>
+                        <h2 id="habit-upgrade-title" class="text-lg font-bold text-navy">Your free habits are full</h2>
+                        <p class="mt-2 text-sm leading-relaxed text-gray-600">You have used {{ $freeHabitLimit }} habits. Unlock Premium for unlimited habits.</p>
                     </div>
                     <div class="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
-                        <a href="{{ route('premium') }}" class="inline-flex min-h-10 items-center justify-center rounded-xl bg-navy px-5 text-sm font-semibold text-white transition hover:bg-navy/90">Buka Premium</a>
-                        <button type="button" wire:click="closeHabitUpgradeModal" class="min-h-10 rounded-xl px-5 text-sm font-semibold text-gray-500 transition hover:bg-gray-100">Nanti dulu</button>
+                        <a href="{{ route('premium') }}" class="inline-flex min-h-10 items-center justify-center rounded-xl bg-navy px-5 text-sm font-semibold text-white transition hover:bg-navy/90">Unlock Premium</a>
+                        <button type="button" wire:click="closeHabitUpgradeModal" class="min-h-10 rounded-xl px-5 text-sm font-semibold text-gray-500 transition hover:bg-gray-100">Not now</button>
                     </div>
                 </div>
             </section>
@@ -374,7 +381,7 @@
                 <div class="flex items-center justify-between pb-4 border-b border-gray-100">
                     <div>
                         <h3 class="text-lg font-bold text-navy">Daily Evidence Check-In</h3>
-                        <p class="text-xs text-gray-400">Masukkan indikator kesehatanmu untuk menghitung Well-being Index</p>
+                        <p class="text-xs text-gray-400">Enter your wellness indicators to calculate your Well-being Index</p>
                     </div>
                     <button wire:click="closeDetailedModal" class="text-gray-400 hover:text-navy text-xl">
                         &times;
@@ -384,14 +391,19 @@
                 <div class="py-5 space-y-4">
                     <!-- Mood selection in modal -->
                     <div>
-                        <label class="block text-xs font-bold text-navy mb-2">Pilih Mood Utama</label>
+                        <label class="block text-xs font-bold text-navy mb-2">Select Primary Mood</label>
                         <div class="flex gap-2 flex-wrap">
                             @foreach ($moods as $key => $mood)
                                 <button type="button"
                                         @click="mood = '{{ $key }}'; $wire.set('todayMood', '{{ $key }}', false)"
-                                        class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all {{ $mood['bg'] }} {{ $mood['text'] }}"
-                                        :class="mood === '{{ $key }}' ? 'ring-2 ring-navy opacity-100 scale-105 shadow-sm' : 'opacity-70 hover:opacity-100'">
-                                    {{ $mood['emoji'] }} {{ $mood['label'] }}
+                                        class="px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 border transition-all"
+                                        :class="mood === '{{ $key }}' ? '{{ $mood['active_class'] ?? '' }}' : '{{ $mood['idle_class'] ?? '' }}'">
+                                    <div class="w-5 h-5 rounded-full bg-white/90 p-0.5 shadow-2xs flex items-center justify-center overflow-hidden shrink-0">
+                                        <img src="{{ asset('images/journal/' . ($mood['mascot'] ?? 'maskot-journal3.png')) }}"
+                                             alt="{{ $mood['label'] }}"
+                                             class="w-full h-full object-contain">
+                                    </div>
+                                    <span>{{ $mood['label'] }}</span>
                                 </button>
                             @endforeach
                         </div>
@@ -400,46 +412,46 @@
                     <!-- Sleep Duration -->
                     <div>
                         <div class="flex justify-between text-xs font-bold text-navy mb-1">
-                            <span>Durasi Tidur Semalam</span>
-                            <span class="text-aurea font-extrabold" x-text="sleep + ' Jam'">{{ $sleepDuration }} Jam</span>
+                            <span>Sleep Duration Last Night</span>
+                            <span class="text-aurea font-extrabold" x-text="sleep + ' Hours'">{{ $sleepDuration }} Hours</span>
                         </div>
                         <input type="range" min="3" max="12" step="0.5"
                                x-model="sleep"
                                wire:model="sleepDuration"
                                class="w-full accent-navy cursor-pointer">
-                        <span class="text-[10px] text-gray-400">Rekomendasi remaja: 8 - 10 jam</span>
+                        <span class="text-[10px] text-gray-400">Teen recommendation: 8 - 10 hours</span>
                     </div>
 
                     <!-- Physical Activity -->
                     <div>
                         <div class="flex justify-between text-xs font-bold text-navy mb-1">
-                            <span>Aktivitas Fisik Hari Ini</span>
-                            <span class="text-aurea font-extrabold" x-text="physical + ' Menit'">{{ $physicalActivityDuration }} Menit</span>
+                            <span>Physical Activity Today</span>
+                            <span class="text-aurea font-extrabold" x-text="physical + ' Minutes'">{{ $physicalActivityDuration }} Minutes</span>
                         </div>
                         <input type="range" min="0" max="180" step="5"
                                x-model="physical"
                                wire:model="physicalActivityDuration"
                                class="w-full accent-navy cursor-pointer">
-                        <span class="text-[10px] text-gray-400">Pedoman WHO: minimal 60 menit sehari</span>
+                        <span class="text-[10px] text-gray-400">WHO guideline: at least 60 minutes a day</span>
                     </div>
 
                     <!-- Screen Time -->
                     <div>
                         <div class="flex justify-between text-xs font-bold text-navy mb-1">
-                            <span>Screen Time Rekreasional</span>
-                            <span class="text-aurea font-extrabold" x-text="screen + ' Jam'">{{ $screenTimeDuration }} Jam</span>
+                            <span>Recreational Screen Time</span>
+                            <span class="text-aurea font-extrabold" x-text="screen + ' Hours'">{{ $screenTimeDuration }} Hours</span>
                         </div>
                         <input type="range" min="0.5" max="14" step="0.5"
                                x-model="screen"
                                wire:model="screenTimeDuration"
                                class="w-full accent-navy cursor-pointer">
-                        <span class="text-[10px] text-gray-400">Batas wajar: &lt; 4 jam sehari</span>
+                        <span class="text-[10px] text-gray-400">Healthy limit: &lt; 4 hours a day</span>
                     </div>
 
                     <!-- WHO-5 Mental Well-being -->
                     <div>
                         <div class="flex justify-between text-xs font-bold text-navy mb-1">
-                            <span>Indikator Mental Well-being (WHO-5)</span>
+                            <span>Mental Well-being Index (WHO-5)</span>
                             <span class="text-aurea font-extrabold" x-text="who5 + ' / 100'">{{ $who5Score }} / 100</span>
                         </div>
                         <input type="range" min="0" max="100" step="5"
@@ -450,8 +462,8 @@
 
                     <!-- Catatan Tambahan -->
                     <div>
-                        <label class="block text-xs font-bold text-navy mb-1">Catatan Tambahan (Jurnal Singkat)</label>
-                        <textarea wire:model="note" rows="2" placeholder="Apa yang kamu rasakan hari ini?"
+                        <label class="block text-xs font-bold text-navy mb-1">Additional Notes (Quick Journal)</label>
+                        <textarea wire:model="note" rows="2" placeholder="How are you feeling today?"
                                   class="w-full bg-gray-50 rounded-2xl p-3 text-xs border border-gray-200 focus:outline-none focus:ring-2 focus:ring-navy"></textarea>
                     </div>
                 </div>
@@ -459,17 +471,17 @@
                 <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
                     <button type="button" wire:click="closeDetailedModal"
                             class="px-4 py-2 rounded-full text-xs font-semibold text-gray-500 hover:text-navy">
-                        Batal
+                        Cancel
                     </button>
                     <button type="button" wire:click="saveDetailedCheckIn" wire:loading.attr="disabled"
                             class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold bg-navy text-white shadow-md hover:bg-opacity-95 transition disabled:opacity-50">
-                        <span wire:loading.remove wire:target="saveDetailedCheckIn">Hitung Index & Simpan</span>
+                        <span wire:loading.remove wire:target="saveDetailedCheckIn">Calculate Index & Save</span>
                         <span wire:loading wire:target="saveDetailedCheckIn" class="inline-flex items-center gap-2">
                             <svg class="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                             </svg>
-                            Menghitung...
+                            Calculating...
                         </span>
                     </button>
                 </div>

@@ -137,7 +137,7 @@ it('limits free users to three active progress habits and offers premium', funct
 
     $dashboard->call('openAddHabitModal')
         ->assertSet('showHabitUpgradeModal', true)
-        ->assertSee('Kamu sudah memakai 3 habit. Buka Premium untuk habit tanpa batas.')
+        ->assertSee('You have used 3 habits. Unlock Premium for unlimited habits.')
         ->assertSee(route('premium'))
         ->set('customHabitName', 'Habit keempat')
         ->set('customHabitTarget', 1)
@@ -195,8 +195,8 @@ it('shows a navigable calendar month on the dashboard', function () {
     Livewire::actingAs($user)
         ->test(Dashboard::class)
         ->assertSee($month)
-        ->assertSee('Buka lebih banyak fitur')
-        ->assertSee('Buka Premium')
+        ->assertSee('Unlock more features')
+        ->assertSee('Unlock Premium')
         ->assertSee(route('premium.activate'))
         ->call('nextMonth')
         ->assertSee($nextMonth);
@@ -208,8 +208,8 @@ it('shows premium status instead of the upgrade banner for premium users', funct
 
     Livewire::actingAs($user)
         ->test(Dashboard::class)
-        ->assertSee('Premium Aktif')
-        ->assertDontSee('Buka Premium');
+        ->assertSee('Premium Active')
+        ->assertDontSee('Unlock Premium');
 });
 
 it('can toggle checklist habit and update value', function () {

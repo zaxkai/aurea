@@ -58,7 +58,7 @@ class AiAurea extends Component
         $content = trim($validated['message']);
 
         if ($content === '') {
-            $this->addError('message', 'Tulis pesan terlebih dahulu.');
+            $this->addError('message', 'Please type a message first.');
 
             return;
         }
@@ -171,7 +171,7 @@ class AiAurea extends Component
             ->get()
             ->map(fn (ChatSession $session): array => [
                 'id' => $session->id,
-                'title' => $session->title ?: 'Percakapan baru',
+                'title' => $session->title ?: 'New conversation',
                 'updated_at' => $session->updated_at->diffForHumans(),
             ])
             ->all();

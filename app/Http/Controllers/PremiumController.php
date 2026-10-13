@@ -18,6 +18,6 @@ class PremiumController extends Controller
 
         return redirect()
             ->route('premium')
-            ->with('success', 'Premium sudah aktif. Selamat menikmati fitur lebih lengkap!');
+            ->with('success', 'Premium is now active. Enjoy all the enhanced features!');
     }
 }

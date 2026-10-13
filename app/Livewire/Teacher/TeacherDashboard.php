@@ -90,10 +90,41 @@ class TeacherDashboard extends Component
         $totalCheckins = $weeklyCheckins->count();
 
         $moodStats = [
-            'calm' => ['label' => 'Calm', 'emoji' => '😌', 'pct' => 0, 'count' => 0],
-            'neutral' => ['label' => 'Neutral', 'emoji' => '😐', 'pct' => 0, 'count' => 0],
-            'stressed' => ['label' => 'Stressed', 'emoji' => '😰', 'pct' => 0, 'count' => 0],
-            'exhausted' => ['label' => 'Exhausted', 'emoji' => '😫', 'pct' => 0, 'count' => 0],
+            'energetic' => [
+                'label' => 'Energetic',
+                'mascot' => 'maskot-journal2.png',
+                'bg_color' => 'bg-[#f4f9be]',
+                'pct' => 0,
+                'count' => 0,
+            ],
+            'calm' => [
+                'label' => 'Calm',
+                'mascot' => 'maskot-journal3.png',
+                'bg_color' => 'bg-[#fce7f3]',
+                'pct' => 0,
+                'count' => 0,
+            ],
+            'neutral' => [
+                'label' => 'Neutral',
+                'mascot' => 'maskot-journal3.png',
+                'bg_color' => 'bg-[#d1fae5]',
+                'pct' => 0,
+                'count' => 0,
+            ],
+            'stressed' => [
+                'label' => 'Stressed',
+                'mascot' => 'maskot-journal1.png',
+                'bg_color' => 'bg-[#ffe4e6]',
+                'pct' => 0,
+                'count' => 0,
+            ],
+            'exhausted' => [
+                'label' => 'Exhausted',
+                'mascot' => 'maskot-journal4.png',
+                'bg_color' => 'bg-[#e0f2fe]',
+                'pct' => 0,
+                'count' => 0,
+            ],
         ];
 
         if ($totalCheckins > 0) {
@@ -104,10 +135,11 @@ class TeacherDashboard extends Component
             unset($stat);
         } else {
             // Default placeholder representation if no checkins yet
-            $moodStats['calm']['pct'] = 28;
-            $moodStats['neutral']['pct'] = 42;
-            $moodStats['stressed']['pct'] = 19;
-            $moodStats['exhausted']['pct'] = 11;
+            $moodStats['energetic']['pct'] = 25;
+            $moodStats['calm']['pct'] = 30;
+            $moodStats['neutral']['pct'] = 25;
+            $moodStats['stressed']['pct'] = 12;
+            $moodStats['exhausted']['pct'] = 8;
         }
 
         return view('livewire.teacher.teacher-dashboard', [

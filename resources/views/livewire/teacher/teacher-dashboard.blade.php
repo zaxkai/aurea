@@ -153,16 +153,18 @@
         <div class="bg-[#e4ebfc] rounded-[28px] p-6 sm:p-8 space-y-4 shadow-sm">
             @foreach ($moodStats as $key => $mood)
                 <div class="flex items-center gap-4 sm:gap-6">
-                    <!-- Mood Label with Emoji -->
-                    <div class="flex items-center gap-2.5 w-24 sm:w-28 shrink-0">
-                        <span class="text-xl sm:text-2xl select-none">{{ $mood['emoji'] }}</span>
+                    <!-- Mood Label with Mascot -->
+                    <div class="flex items-center gap-2.5 w-28 sm:w-32 shrink-0">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full {{ $mood['bg_color'] }} p-1 shadow-2xs flex items-center justify-center shrink-0 border border-black/5">
+                            <img src="{{ asset('images/journal/' . $mood['mascot']) }}" alt="{{ $mood['label'] }}" class="w-full h-full object-contain">
+                        </div>
                         <span class="font-bold text-sm sm:text-base text-[#000F2E]">{{ $mood['label'] }}</span>
                     </div>
 
                     <!-- Progress Bar Container -->
                     <div class="flex-1 bg-white h-7 sm:h-8 rounded-full overflow-hidden p-1 shadow-inner relative">
                         <div class="bg-[#000F2E] h-full rounded-full transition-all duration-700 ease-out"
-                             style="width: {{ max(4, $mood['pct']) }}%"></div>
+                             style="width: {{ $mood['pct'] > 0 ? max(4, $mood['pct']) : 0 }}%"></div>
                     </div>
 
                     <!-- Percentage -->

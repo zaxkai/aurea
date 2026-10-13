@@ -31,8 +31,8 @@ it('activates premium for the signed-in user in demo mode', function () {
 
     $this->get(route('premium'))
         ->assertOk()
-        ->assertSee('Premium Aktif')
-        ->assertDontSee('Aktifkan Premium');
+        ->assertSee('Premium Active')
+        ->assertDontSee('Activate Premium');
 });
 
 it('returns the signed-in user to free from settings', function () {
