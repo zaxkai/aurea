@@ -137,27 +137,25 @@
                                     $log = $habit->logs->first();
                                     $isDone = ($log->value_logged ?? 0) >= $habit->target_value;
                                 @endphp
-                                <div wire:key="checklist-habit-{{ $habit->id }}"
-                                     x-data="{ done: @js($isDone) }"
-                                     @click="done = !done"
-                                     wire:click.throttle.300ms="toggleHabit({{ $habit->id }})"
-                                     wire:loading.class="opacity-75"
-                                     wire:target="toggleHabit({{ $habit->id }})"
-                                     class="flex items-center justify-between px-4 py-3 rounded-2xl bg-gray-50/80 border border-gray-100 hover:bg-gray-100/70 transition cursor-pointer select-none group">
-                                    <span class="text-xs font-semibold transition-colors {{ $isDone ? 'line-through text-gray-400' : 'text-navy' }}"
-                                          :class="done ? 'line-through text-gray-400' : 'text-navy'">
+                                <button type="button"
+                                        wire:key="checklist-habit-{{ $habit->id }}"
+                                        wire:click.throttle.300ms="toggleHabit({{ $habit->id }})"
+                                        wire:loading.attr="disabled"
+                                        wire:loading.class="opacity-60"
+                                        wire:target="toggleHabit({{ $habit->id }})"
+                                        class="w-full flex items-center justify-between px-4 py-3 rounded-2xl border transition text-left select-none active:scale-[0.99] group {{ $isDone ? 'bg-gray-50/60 border-gray-100' : 'bg-gray-50/90 border-gray-100 hover:bg-gray-100/70 hover:border-gray-200' }}"
+                                        title="{{ $isDone ? __('Click to uncheck') : __('Click to check') }}">
+                                    <span class="text-xs font-semibold transition-colors {{ $isDone ? 'line-through text-gray-400' : 'text-navy' }}">
                                         {{ $habit->name }}
                                     </span>
-                                    <button type="button"
-                                            wire:loading.attr="disabled"
-                                            wire:target="toggleHabit({{ $habit->id }})"
-                                            class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0 pointer-events-none {{ $isDone ? 'bg-navy border-navy text-white shadow-sm' : 'border-gray-300 group-hover:border-navy bg-white' }}"
-                                            :class="done ? 'bg-navy border-navy text-white shadow-sm' : 'border-gray-300 group-hover:border-navy bg-white'">
-                                        <svg x-show="done" style="{{ $isDone ? '' : 'display: none;' }}" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </button>
-                                </div>
+                                    <span class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0 {{ $isDone ? 'bg-navy border-navy text-white shadow-sm' : 'border-gray-300 group-hover:border-navy bg-white' }}">
+                                        @if ($isDone)
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        @endif
+                                    </span>
+                                </button>
                             @empty
                                 <div class="text-center py-4 text-xs text-gray-400">
                                     {{ __('No daily checklist yet.') }}
