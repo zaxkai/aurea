@@ -17,45 +17,64 @@ new #[Layout('layouts.guest')] class extends Component
             'email' => ['required', 'string', 'email'],
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $this->only('email')
-        );
+        try {
+            $status = Password::sendResetLink(
+                $this->only('email')
+            );
 
-        if ($status != Password::RESET_LINK_SENT) {
-            $this->addError('email', __($status));
+            if ($status != Password::RESET_LINK_SENT) {
+                $this->addError('email', __($status));
 
-            return;
+                return;
+            }
+
+            $this->reset('email');
+
+            session()->flash('status', __($status));
+        } catch (\Throwable $e) {
+            report($e);
+            $this->addError('email', __('Could not send reset email. Please ensure the mail server/SMTP is configured on the server.'));
         }
-
-        $this->reset('email');
-
-        session()->flash('status', __($status));
     }
 }; ?>
 
 <div>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
-
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
+    <div class="mb-6 text-center">
+        <h2 class="text-2xl font-bold text-gray-900">{{ __('Forgot Password') }}</h2>
+        <p class="text-xs text-gray-500 mt-2">
+            {{ __('Enter your registered email and we will send you a password reset link.') }}
+        </p>
+    </div>
+
     <form wire:submit="sendPasswordResetLink">
+        @csrf
         <!-- Email Address -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <label for="email" class="block font-medium text-xs text-gray-500 mb-1">{{ __('Email') }}</label>
+            <input wire:model="email" id="email" type="email" required autofocus autocomplete="username" placeholder="name@example.com" class="bg-gray-50 border-transparent focus:border-gray-500 focus:bg-white focus:ring-gray-500 rounded-xl shadow-none block w-full text-sm py-2.5 px-3" />
+            @error('email') <span class="text-xs text-red-600 mt-1 block">{{ $message }}</span> @enderror
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
+        <div class="mt-6">
+            <button type="submit" wire:loading.attr="disabled" class="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition active:scale-[0.99] disabled:opacity-60">
+                <span wire:loading.remove>{{ __('Send Reset Link') }}</span>
+                <span wire:loading class="flex items-center gap-2">
+                    <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {{ __('Sending link...') }}
+                </span>
+            </button>
+        </div>
+
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-600">
+                {{ __('Remember your password?') }} <a href="{{ route('login') }}" class="font-bold text-gray-900 hover:underline" wire:navigate>{{ __('Sign In') }}</a>
+            </p>
         </div>
     </form>
 </div>
