@@ -65,7 +65,7 @@
                         <div wire:key="chat-message-{{ $chatMessage['id'] }}" class="flex {{ $chatMessage['role'] === 'user' ? 'justify-end' : 'justify-start' }}">
                             @if ($chatMessage['role'] === 'assistant')
                                 <div class="mr-3 mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white p-1.5">
-                                    <img src="{{ asset('images/AI-logo_aurea.png') }}" alt="Aurea" class="h-full w-full object-contain">
+                                    <img src="{{ asset('images/AI_AUREA.png') }}" alt="Aurea" class="h-full w-full object-contain">
                                 </div>
                             @endif
                             <p class="max-w-[85%] whitespace-pre-line rounded-[24px] px-5 py-3 text-sm leading-relaxed {{ $chatMessage['role'] === 'user' ? 'bg-[#64ded9] text-navy' : 'bg-white/80 text-navy shadow-sm' }}">{{ $chatMessage['content'] }}</p>
