@@ -69,66 +69,68 @@ Route::post('check-in', [CheckInController::class, 'store'])
 
 require __DIR__.'/auth.php';
 
-Route::get('/seed-notifications', function () {
-    try {
-        Artisan::call('migrate', ['--force' => true]);
+if (app()->isLocal()) {
+    Route::middleware('auth')->get('/seed-notifications', function () {
+        try {
+            Artisan::call('migrate', ['--force' => true]);
 
-        $user = auth()->user();
-        if ($user) {
-            if ($user->isTeacher()) {
-                $user->notify(new AppNotification(
-                    '⚠️ Siswa Membutuhkan Perhatian',
-                    'Alex Turner (Class 10-A) mencatat skor wellbeing 42% dengan kondisi emosional Stres (Stressed).',
-                    'warning',
-                    'warning',
-                    route('teacher.students', ['search' => 'Alex Turner', 'statusFilter' => 'attention'])
-                ));
+            $user = auth()->user();
+            if ($user) {
+                if ($user->isTeacher()) {
+                    $user->notify(new AppNotification(
+                        '⚠️ Siswa Membutuhkan Perhatian',
+                        'Alex Turner (Class 10-A) mencatat skor wellbeing 42% dengan kondisi emosional Stres (Stressed).',
+                        'warning',
+                        'warning',
+                        route('teacher.students', ['search' => 'Alex Turner', 'statusFilter' => 'attention'])
+                    ));
 
-                $user->notify(new AppNotification(
-                    '🎓 Siswa Baru Bergabung',
-                    'Miles Kane baru saja bergabung ke kelas Class 10-A.',
-                    'student',
-                    'info',
-                    route('teacher.students', ['search' => 'Miles Kane'])
-                ));
+                    $user->notify(new AppNotification(
+                        '🎓 Siswa Baru Bergabung',
+                        'Miles Kane baru saja bergabung ke kelas Class 10-A.',
+                        'student',
+                        'info',
+                        route('teacher.students', ['search' => 'Miles Kane'])
+                    ));
 
-                $user->notify(new AppNotification(
-                    '📊 Rekap Mingguan Kelas',
-                    'Minggu ini: Rata-rata wellbeing siswa 78%. 8 siswa kondisi stabil, 2 siswa memerlukan perhatian.',
-                    'chart',
-                    'info',
-                    route('teacher.students', ['statusFilter' => 'attention'])
-                ));
-            } else {
-                $user->notify(new AppNotification(
-                    'Welcome to Premium!',
-                    'You now have unlimited habits and priority AI responses. Keep growing!',
-                    'star',
-                    'success',
-                    '/premium'
-                ));
+                    $user->notify(new AppNotification(
+                        '📊 Rekap Mingguan Kelas',
+                        'Minggu ini: Rata-rata wellbeing siswa 78%. 8 siswa kondisi stabil, 2 siswa memerlukan perhatian.',
+                        'chart',
+                        'info',
+                        route('teacher.students', ['statusFilter' => 'attention'])
+                    ));
+                } else {
+                    $user->notify(new AppNotification(
+                        'Welcome to Premium!',
+                        'You now have unlimited habits and priority AI responses. Keep growing!',
+                        'star',
+                        'success',
+                        '/premium'
+                    ));
 
-                $user->notify(new AppNotification(
-                    '🔥 3 Days Streak!',
-                    'You are on fire! Keep the momentum going.',
-                    'fire',
-                    'warning'
-                ));
+                    $user->notify(new AppNotification(
+                        '🔥 3 Days Streak!',
+                        'You are on fire! Keep the momentum going.',
+                        'fire',
+                        'warning'
+                    ));
 
-                $user->notify(new AppNotification(
-                    'Your Tree is Growing',
-                    'Your Habit Growth Tree just leveled up. Check it out!',
-                    'tree',
-                    'info',
-                    '/habit-growth-tree'
-                ));
+                    $user->notify(new AppNotification(
+                        'Your Tree is Growing',
+                        'Your Habit Growth Tree just leveled up. Check it out!',
+                        'tree',
+                        'info',
+                        '/habit-growth-tree'
+                    ));
+                }
+
+                return 'Notifications seeded and migrated successfully! <a href="/dashboard">Go back</a>';
             }
 
-            return 'Notifications seeded and migrated successfully! <a href="/dashboard">Go back</a>';
+            return 'Please log in first.';
+        } catch (Exception $e) {
+            return 'Error: '.$e->getMessage();
         }
-
-        return 'Please log in first.';
-    } catch (Exception $e) {
-        return 'Error: '.$e->getMessage();
-    }
-});
+    });
+}

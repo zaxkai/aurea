@@ -80,6 +80,8 @@ class SubscriptionController extends Controller
                     'started_at' => now(),
                     'expires_at' => now()->addDays(30),
                 ]);
+
+                $subscription->user?->activatePremium();
             }
         } elseif ($status === 'deny' || $status === 'cancel' || $status === 'expire') {
             $subscription->update(['status' => 'failed']);
