@@ -62,10 +62,7 @@ new #[Layout('layouts.guest')] class extends Component
             <button type="submit" wire:loading.attr="disabled" class="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition active:scale-[0.99] disabled:opacity-60">
                 <span wire:loading.remove>{{ __('Send Reset Link') }}</span>
                 <span wire:loading class="flex items-center gap-2">
-                    <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                    <x-ui.message-loading class="w-5 h-5 text-white" />
                     {{ __('Sending link...') }}
                 </span>
             </button>
