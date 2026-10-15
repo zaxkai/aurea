@@ -146,7 +146,7 @@
             </div>
         @endif
 
-        <form @submit.prevent="send()" wire:submit.prevent="sendMessage" class="mx-auto flex w-full items-center gap-2 rounded-full bg-white p-2 pl-6 shadow-[0_12px_35px_rgba(6,24,55,0.12)]">
+        <form @submit.prevent="send()" class="mx-auto flex w-full items-center gap-2 rounded-full bg-white p-2 pl-6 shadow-[0_12px_35px_rgba(6,24,55,0.12)]">
             <label for="ai-message" class="sr-only">Message for Aurea</label>
             <input id="ai-message" 
                    x-ref="inputField"

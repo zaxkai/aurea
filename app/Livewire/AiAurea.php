@@ -74,6 +74,19 @@ class AiAurea extends Component
             ? $user->chatSessions()->findOrFail($this->activeSessionId)
             : null;
 
+        // Prevent duplicate concurrent / rapid submissions of identical message
+        if ($session) {
+            $lastUserMessage = $session->messages()->where('role', 'user')->latest('id')->first();
+            if ($lastUserMessage && $lastUserMessage->content === $content && $lastUserMessage->created_at->diffInSeconds(now()) < 2) {
+                $this->message = '';
+                $this->showHistory = false;
+                $this->loadSession($session->id);
+                $this->refreshSessions();
+
+                return;
+            }
+        }
+
         $history = $session
             ? $session->messages()
                 ->orderByDesc('id')
