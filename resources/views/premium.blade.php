@@ -121,6 +121,7 @@
                                 <li class="flex gap-2"><span aria-hidden="true">✦</span><span>Track as many habits as you need</span></li>
                                 <li class="flex gap-2"><span aria-hidden="true">✦</span><span>View weekly and monthly analytics</span></li>
                                 <li class="flex gap-2"><span aria-hidden="true">✦</span><span>Smart reminders tailored to your routine</span></li>
+                                <li class="flex gap-2"><span aria-hidden="true">✦</span><span><strong>Kostumisasi Skin Pohon:</strong> Bebas pilih tema pohon (Sakura, Cemara, Musim Gugur, Natal, Apel Buah) di Habit Growth Tree</span></li>
                             </ul>
                         </div>
                         <img src="{{ asset('images/maskot_aurea.png') }}" alt="Aurea Mascot" class="mx-auto h-36 w-20 max-w-full object-contain sm:h-44 sm:w-24">
@@ -133,6 +134,10 @@
 
                         @if (auth()->user()->isPremium())
                             <span class="flex min-h-11 w-full items-center justify-center rounded-full bg-[#00bfc3] px-5 text-sm font-semibold text-white">Premium Active</span>
+                            <a href="{{ route('habit-growth-tree') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-navy hover:underline mt-0.5">
+                                <span>🎨</span>
+                                <span>Kostumisasi Skin Pohon Sekarang →</span>
+                            </a>
                         @else
                             <form method="POST" action="{{ route('premium.activate') }}" class="w-full">
                                 @csrf

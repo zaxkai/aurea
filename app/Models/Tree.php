@@ -7,7 +7,84 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tree extends Model
 {
-    protected $fillable = ['user_id', 'growth_percentage'];
+    protected $fillable = ['user_id', 'growth_percentage', 'skin'];
+
+    public const AVAILABLE_SKINS = [
+        'default' => [
+            'key' => 'default',
+            'name' => 'Klasik Aurea',
+            'tag' => 'Gratis • Default',
+            'desc' => 'Pohon orisinal Aurea dengan daun hijau cerah dan kanopi rimbun.',
+            'is_premium' => false,
+            'color' => '#10B981',
+            'icon' => '🌳',
+        ],
+        'sakura' => [
+            'key' => 'sakura',
+            'name' => 'Bunga Sakura',
+            'tag' => '⭐ Premium Eksklusif',
+            'desc' => 'Pohon sakura Jepang dengan guguran bunga merah muda yang menenangkan.',
+            'is_premium' => true,
+            'color' => '#EC4899',
+            'icon' => '🌸',
+        ],
+        'cemara' => [
+            'key' => 'cemara',
+            'name' => 'Pohon Cemara',
+            'tag' => '⭐ Premium Eksklusif',
+            'desc' => 'Pohon evergreen hijau kokoh lambang ketangguhan dan ketenangan jiwa.',
+            'is_premium' => true,
+            'color' => '#059669',
+            'icon' => '🌲',
+        ],
+        'gugur' => [
+            'key' => 'gugur',
+            'name' => 'Musim Gugur',
+            'tag' => '⭐ Premium Eksklusif',
+            'desc' => 'Dedaunan maple hangat keemasan bernuansa estetik dan reflektif.',
+            'is_premium' => true,
+            'color' => '#EA580C',
+            'icon' => '🍂',
+        ],
+        'natal' => [
+            'key' => 'natal',
+            'name' => 'Pohon Natal',
+            'tag' => '⭐ Premium Eksklusif',
+            'desc' => 'Pohon cemara berhias bintang emas, lampu, dan kado penuh sukacita.',
+            'is_premium' => true,
+            'color' => '#DC2626',
+            'icon' => '🎄',
+        ],
+        'buah' => [
+            'key' => 'buah',
+            'name' => 'Pohon Apel Buah',
+            'tag' => '⭐ Premium Eksklusif',
+            'desc' => 'Pohon buah rindang sarat dengan apel merah ranum berlimpah.',
+            'is_premium' => true,
+            'color' => '#E11D48',
+            'icon' => '🍎',
+        ],
+    ];
+
+    public function getSkinAttribute(?string $value): string
+    {
+        return array_key_exists($value ?? '', self::AVAILABLE_SKINS) ? $value : 'default';
+    }
+
+    public function getSkinDetailsAttribute(): array
+    {
+        return self::AVAILABLE_SKINS[$this->skin] ?? self::AVAILABLE_SKINS['default'];
+    }
+
+    public function imagePathForStage(int $stage): string
+    {
+        $skin = $this->skin;
+        if ($skin !== 'default' && file_exists(public_path("images/habit-growth-tree/skins/{$skin}/pohon{$stage}.png"))) {
+            return asset("images/habit-growth-tree/skins/{$skin}/pohon{$stage}.png");
+        }
+
+        return asset("images/habit-growth-tree/pohon{$stage}.png");
+    }
 
     protected ?int $cachedCompletedCount = null;
 

@@ -284,14 +284,28 @@
 
                 <!-- Growth Tree Preview (White Card) -->
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100/60 flex flex-col items-center justify-between text-center">
-                    <h3 class="font-bold text-base text-navy mb-2">Growth Tree Preview</h3>
+                    <div class="flex items-center justify-between w-full mb-1">
+                        <h3 class="font-bold text-base text-navy">Growth Tree Preview</h3>
+                        @if ($tree->skin !== 'default')
+                            <span class="rounded-full bg-pink-50 text-pink-700 border border-pink-200 px-2 py-0.5 text-[10px] font-bold">
+                                {{ $tree->skin_details['name'] ?? $tree->skin }}
+                            </span>
+                        @endif
+                    </div>
 
                     <x-growth-tree :stage="$treeStage" compact />
                     <p class="text-xs font-medium text-gray-500">{{ $completedGrowthItemsCount }} {{ __('targets completed') }}</p>
 
-                    <a href="{{ route('habit-growth-tree') }}" class="mt-2 text-xs font-semibold text-gray-500 transition hover:text-navy">
-                        See full
-                    </a>
+                    <div class="flex items-center gap-2.5 mt-2">
+                        <a href="{{ route('habit-growth-tree') }}" class="text-xs font-semibold text-gray-500 transition hover:text-navy">
+                            See full
+                        </a>
+                        <span class="text-gray-300">•</span>
+                        <a href="{{ route('habit-growth-tree') }}" class="text-xs font-bold text-[#008e95] hover:text-navy inline-flex items-center gap-1 transition">
+                            <span>🎨</span>
+                            <span>Ganti Skin</span>
+                        </a>
+                    </div>
                 </div>
 
             </div>

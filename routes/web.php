@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\PremiumController;
+use App\Http\Controllers\TreeSkinController;
 use App\Models\Tree;
 use App\Notifications\AppNotification;
 use Illuminate\Support\Facades\Artisan;
@@ -39,12 +40,19 @@ Route::get('habit-growth-tree', function () {
     $completedGrowthItemsCount = $tree->completedGrowthItemsCount();
 
     return view('habit-growth-tree', [
+        'tree' => $tree,
         'completedGrowthItemsCount' => $completedGrowthItemsCount,
         'treeStage' => Tree::growthStageForCompletedItems($completedGrowthItemsCount),
+        'availableSkins' => Tree::AVAILABLE_SKINS,
+        'currentSkin' => $tree->skin,
     ]);
 })
     ->middleware(['auth', 'verified', 'onboarding'])
     ->name('habit-growth-tree');
+
+Route::post('habit-growth-tree/skin', [TreeSkinController::class, 'update'])
+    ->middleware(['auth', 'verified', 'onboarding'])
+    ->name('habit-growth-tree.skin');
 
 Route::view('ai-aurea', 'ai-aurea')
     ->middleware(['auth', 'verified', 'onboarding'])

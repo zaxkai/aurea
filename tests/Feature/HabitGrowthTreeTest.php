@@ -138,3 +138,80 @@ it('uses the same task-based tree stage in the dashboard preview', function () {
         ->get(route('dashboard'))
         ->assertSee(asset('images/habit-growth-tree/pohon3.png'), false);
 });
+
+it('prevents free students from applying premium tree skins', function () {
+    $user = User::factory()->create([
+        'onboarding_completed_at' => now(),
+    ]);
+    $user->tree()->create(['growth_percentage' => 30, 'skin' => 'default']);
+
+    expect($user->isPremium())->toBeFalse();
+
+    $response = $this->actingAs($user)
+        ->from(route('habit-growth-tree'))
+        ->post(route('habit-growth-tree.skin'), ['skin' => 'sakura']);
+
+    $response
+        ->assertRedirect(route('habit-growth-tree'))
+        ->assertSessionHas('error');
+
+    expect($user->fresh()->tree->skin)->toBe('default');
+});
+
+it('allows premium students to customize tree skins and renders the custom skin', function (string $skinKey, string $skinName) {
+    $user = User::factory()->create([
+        'onboarding_completed_at' => now(),
+    ]);
+    $user->activatePremium();
+
+    // 1. Post to change skin
+    $response = $this->actingAs($user)
+        ->from(route('habit-growth-tree'))
+        ->post(route('habit-growth-tree.skin'), ['skin' => $skinKey]);
+
+    $response
+        ->assertRedirect(route('habit-growth-tree'))
+        ->assertSessionHas('success');
+
+    $tree = $user->fresh()->tree;
+    expect($tree->skin)->toBe($skinKey);
+
+    // 2. View habit growth tree page and assert custom skin image is rendered
+    $this->actingAs($user)
+        ->get(route('habit-growth-tree'))
+        ->assertOk()
+        ->assertSee(asset("images/habit-growth-tree/skins/{$skinKey}/pohon0.png"), false)
+        ->assertSee($skinName);
+
+    // 3. View dashboard preview card and assert custom skin image is rendered
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee(asset("images/habit-growth-tree/skins/{$skinKey}/pohon0.png"), false)
+        ->assertSee($skinName);
+})->with([
+    'sakura' => ['sakura', 'Bunga Sakura'],
+    'cemara' => ['cemara', 'Pohon Cemara'],
+    'gugur' => ['gugur', 'Musim Gugur'],
+    'natal' => ['natal', 'Pohon Natal'],
+    'buah' => ['buah', 'Pohon Apel Buah'],
+]);
+
+it('allows premium students to switch back to default skin', function () {
+    $user = User::factory()->create([
+        'onboarding_completed_at' => now(),
+    ]);
+    $user->activatePremium();
+
+    // Set to sakura first
+    $user->tree()->create(['growth_percentage' => 30, 'skin' => 'sakura']);
+
+    // Switch back to default
+    $this->actingAs($user)
+        ->from(route('habit-growth-tree'))
+        ->post(route('habit-growth-tree.skin'), ['skin' => 'default'])
+        ->assertRedirect(route('habit-growth-tree'))
+        ->assertSessionHas('success');
+
+    expect($user->fresh()->tree->skin)->toBe('default');
+});
