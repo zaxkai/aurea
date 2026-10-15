@@ -28,7 +28,7 @@
     @if ($stage >= 2)
         <div class="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden="true">
             @foreach (range(1, 6) as $leaf)
-                <span class="tree-leaf"></span>
+                <span class="tree-leaf tree-leaf--{{ $treeSkin }}"></span>
             @endforeach
         </div>
     @endif

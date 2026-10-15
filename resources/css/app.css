@@ -69,6 +69,79 @@
     animation: growth-tree-leaf-fall 6s linear infinite;
 }
 
+/* 1. Pohon Sakura: Animasi daun/kelopak bunga warna pink */
+.tree-leaf--sakura {
+    width: 0.75rem;
+    height: 0.95rem;
+    border-radius: 60% 40% 60% 40%;
+    background: linear-gradient(135deg, #fbcfe8 0%, #f472b6 100%);
+    box-shadow: 0 1px 3px rgba(244, 114, 182, 0.4);
+}
+
+/* 2. Pohon Natal: Animasi salju jatuh */
+.tree-leaf--natal {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffffff 60%, #e0f2fe 100%);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.95);
+    animation-duration: 5.5s;
+}
+
+/* 3. Pohon Gugur: Animasi daun warna orange */
+.tree-leaf--gugur {
+    width: 0.8rem;
+    height: 1.05rem;
+    border-radius: 0 100% 0 100%;
+    background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+    box-shadow: 0 1px 3px rgba(234, 88, 12, 0.4);
+}
+
+/* 4. Pohon Buah: Animasi buah apel jatuh */
+.tree-leaf--buah {
+    width: 0.85rem;
+    height: 0.85rem;
+    border-radius: 46% 46% 50% 50%;
+    background: radial-gradient(circle at 35% 35%, #f87171 0%, #dc2626 55%, #991b1b 100%);
+    box-shadow: 0 2px 4px rgba(185, 28, 28, 0.45);
+}
+.tree-leaf--buah::before {
+    content: '';
+    position: absolute;
+    top: -2.5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1.5px;
+    height: 3px;
+    background: #78350f;
+    border-radius: 1px;
+}
+.tree-leaf--buah::after {
+    content: '';
+    position: absolute;
+    top: -2.5px;
+    left: 55%;
+    width: 3px;
+    height: 2px;
+    background: #16a34a;
+    border-radius: 0 100% 0 100%;
+}
+
+/* 5. Pohon Cemara: Animasi daun hijau */
+.tree-leaf--cemara {
+    width: 0.5rem;
+    height: 1.15rem;
+    border-radius: 0 100% 0 100%;
+    background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+    box-shadow: 0 1px 3px rgba(5, 150, 105, 0.35);
+}
+
+/* 6. Pohon Default / Klasik Aurea */
+.tree-leaf--default {
+    background: #2ee0e0;
+}
+
+
 .tree-leaf:nth-child(1) {
     left: 14%;
     animation-delay: -4.2s;

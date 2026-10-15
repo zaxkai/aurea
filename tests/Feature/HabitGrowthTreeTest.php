@@ -183,11 +183,27 @@ it('allows premium students to customize tree skins and renders the custom skin'
         ->assertSee(asset("images/habit-growth-tree/skins/{$skinKey}/pohon0.png"), false)
         ->assertSee($skinName);
 
-    // 3. View dashboard preview card and assert custom skin image is rendered
+    // 3. Complete tasks so tree grows to stage 3, and verify skin-specific falling particle class
+    foreach (range(1, 6) as $taskNumber) {
+        Task::create([
+            'user_id' => $user->id,
+            'title' => "Completed task {$taskNumber}",
+            'is_done' => true,
+            'completed_at' => now(),
+        ]);
+    }
+
+    $this->actingAs($user)
+        ->get(route('habit-growth-tree'))
+        ->assertOk()
+        ->assertSee("tree-leaf--{$skinKey}", false);
+
+    // 4. View dashboard preview card and assert custom skin image and falling particle class are rendered
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertSee(asset("images/habit-growth-tree/skins/{$skinKey}/pohon0.png"), false)
+        ->assertSee(asset("images/habit-growth-tree/skins/{$skinKey}/pohon3.png"), false)
+        ->assertSee("tree-leaf--{$skinKey}", false)
         ->assertSee($skinName);
 })->with([
     'sakura' => ['sakura', 'Bunga Sakura'],
