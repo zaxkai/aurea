@@ -1,14 +1,28 @@
 <div class="mx-auto max-w-[1100px] space-y-5 pb-8" x-on:keydown.escape.window="$wire.closeModals()">
-    <header class="flex items-start justify-between gap-4">
+    <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold leading-tight text-navy">Journal</h1>
             <p class="mt-1 text-sm text-gray-500">Come sit down, and write your day with me!</p>
         </div>
-        <button type="button" wire:click="openWriteModal" aria-label="Write a journal entry" title="Write a journal entry" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy text-white transition hover:bg-navy/90 focus:outline-none focus:ring-2 focus:ring-aurea focus:ring-offset-2">
-            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                <path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
-            </svg>
-        </button>
+        <div class="flex items-center gap-2.5 self-start sm:self-auto">
+            <!-- Theme Customization Button -->
+            <button type="button"
+                    wire:click="openThemeModal"
+                    class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-navy shadow-xs transition hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-aurea focus:ring-offset-2">
+                <span class="text-sm leading-none">{{ $activeJournalTheme['icon'] ?? '🎨' }}</span>
+                <span>Tema Jurnal</span>
+                @if (auth()->user()->isPremium())
+                    <span class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-black text-amber-800 uppercase tracking-wide">PRO</span>
+                @endif
+            </button>
+
+            <!-- Write Button -->
+            <button type="button" wire:click="openWriteModal" aria-label="Write a journal entry" title="Write a journal entry" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy text-white transition hover:bg-navy/90 focus:outline-none focus:ring-2 focus:ring-aurea focus:ring-offset-2 shadow-xs">
+                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                    <path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+                </svg>
+            </button>
+        </div>
     </header>
 
     <section class="rounded-lg bg-white px-5 py-4 shadow-sm md:px-7" aria-labelledby="mood-statistics-title">
@@ -84,28 +98,67 @@
             <p role="status" class="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">{{ session('journal-saved') }}</p>
         @endif
 
+        @if (session('journal-theme-updated'))
+            <p role="status" class="rounded-lg bg-teal-50 border border-teal-200 px-4 py-3 text-sm font-semibold text-teal-800 flex items-center gap-2">
+                <span>✨</span>
+                <span>{{ session('journal-theme-updated') }}</span>
+            </p>
+        @endif
+
         @forelse ($journals as $journal)
             @php
                 $moodData = $moods[$journal->mood] ?? $moods['neutral'];
                 $isHighlighted = ($highlightedJournalId === $journal->id);
+                $isDefaultTheme = ($activeJournalThemeKey === 'default');
             @endphp
-            <article wire:key="journal-{{ $journal->id }}"
-                     class="flex min-h-[88px] items-center justify-between gap-4 rounded-xl bg-white px-5 py-3.5 shadow-sm md:px-6 transition-all {{ $isHighlighted ? 'ring-2 ring-aurea shadow-md bg-cyan-50/30' : 'border border-gray-100/60' }}">
-                <div class="min-w-0 flex-1">
-                    <div class="flex items-center gap-2">
-                        <p class="text-[11px] font-medium text-slate-400">{{ ($journal->journal_date ?? $journal->created_at)->format('F j, Y') }}</p>
-                        @if ($isHighlighted)
-                            <span class="rounded-full bg-aurea/30 text-navy px-2 py-0.5 text-[10px] font-bold">Selected from search</span>
-                        @endif
+            @if ($isDefaultTheme)
+                <article wire:key="journal-{{ $journal->id }}"
+                         class="flex min-h-[88px] items-center justify-between gap-4 rounded-2xl bg-white px-5 py-3.5 shadow-sm md:px-6 transition-all {{ $isHighlighted ? 'ring-2 ring-aurea shadow-md bg-cyan-50/30' : 'border border-gray-100/60' }}">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2">
+                            <p class="text-[11px] font-medium text-slate-400">{{ ($journal->journal_date ?? $journal->created_at)->format('F j, Y') }}</p>
+                            @if ($isHighlighted)
+                                <span class="rounded-full bg-aurea/30 text-navy px-2 py-0.5 text-[10px] font-bold">Selected from search</span>
+                            @endif
+                        </div>
+                        <h3 class="mt-1 flex items-center gap-1.5 text-sm font-semibold text-navy">
+                            <span class="h-3.5 w-1 shrink-0 rounded-full {{ $moodData['background'] }}" aria-hidden="true"></span>
+                            <span class="truncate">{{ $journal->title }}</span>
+                        </h3>
+                        <p class="mt-0.5 line-clamp-2 text-xs text-slate-500">“{{ \Illuminate\Support\Str::limit($journal->content, 180) }}”</p>
                     </div>
-                    <h3 class="mt-1 flex items-center gap-1.5 text-sm font-semibold text-navy">
-                        <span class="h-3.5 w-1 shrink-0 rounded-full {{ $moodData['background'] }}" aria-hidden="true"></span>
-                        <span class="truncate">{{ $journal->title }}</span>
-                    </h3>
-                    <p class="mt-0.5 line-clamp-2 text-xs text-slate-500">“{{ \Illuminate\Support\Str::limit($journal->content, 180) }}”</p>
-                </div>
-                <img src="{{ asset('images/journal/'.$moodData['mascot']) }}" alt="{{ $moodData['label'] }} mood" class="h-16 w-16 shrink-0 object-contain" loading="lazy">
-            </article>
+                    <img src="{{ asset('images/journal/'.$moodData['mascot']) }}" alt="{{ $moodData['label'] }} mood" class="h-16 w-16 shrink-0 object-contain" loading="lazy">
+                </article>
+            @else
+                <article wire:key="journal-{{ $journal->id }}"
+                         class="relative flex min-h-[96px] sm:min-h-[104px] items-center justify-between rounded-2xl {{ $activeJournalTheme['card_class'] }} px-5 py-4 sm:px-6 sm:py-5 shadow-sm transition-all overflow-hidden bg-cover bg-no-repeat {{ $isHighlighted ? 'ring-2 ring-aurea shadow-md scale-[1.01]' : '' }}"
+                         style="background-image: url('{{ asset($activeJournalTheme['bg_image']) }}'); background-position: center right;">
+                    <div class="min-w-0 flex-1 pr-24 sm:pr-36 md:pr-56 z-10">
+                        <div class="flex items-center gap-2">
+                            <p class="text-[11px] {{ $activeJournalTheme['date_class'] }} flex items-center gap-1">
+                                <span>{{ ($journal->journal_date ?? $journal->created_at)->format('F j, Y') }}</span>
+                                @if (!empty($activeJournalTheme['date_badge']))
+                                    <span class="text-xs">{{ $activeJournalTheme['date_badge'] }}</span>
+                                @endif
+                            </p>
+                            @if ($isHighlighted)
+                                <span class="rounded-full bg-white/90 text-navy px-2 py-0.5 text-[10px] font-bold shadow-xs">Selected</span>
+                            @endif
+                        </div>
+                        <h3 class="mt-1 flex items-center gap-2 text-sm sm:text-base {{ $activeJournalTheme['title_class'] }}">
+                            @if (!empty($activeJournalTheme['bar_style']))
+                                <span class="h-4 w-1.5 shrink-0 rounded-full shadow-xs" style="{{ $activeJournalTheme['bar_style'] }}" aria-hidden="true"></span>
+                            @elseif (!empty($activeJournalTheme['bar_class']))
+                                <span class="h-4 w-1.5 shrink-0 rounded-full {{ $activeJournalTheme['bar_class'] }} shadow-xs" aria-hidden="true"></span>
+                            @else
+                                <span class="h-4 w-1.5 shrink-0 rounded-full {{ $moodData['background'] }}" aria-hidden="true"></span>
+                            @endif
+                            <span class="truncate">{{ $journal->title }}</span>
+                        </h3>
+                        <p class="mt-0.5 line-clamp-2 text-xs {{ $activeJournalTheme['content_class'] }}">“{{ \Illuminate\Support\Str::limit($journal->content, 180) }}”</p>
+                    </div>
+                </article>
+            @endif
         @empty
             <div class="rounded-lg bg-white px-5 py-8 text-center shadow-sm">
                 @if ($search !== '')
@@ -122,7 +175,7 @@
         @endforelse
     </section>
 
-    @if ($showWriteModal || $showSummaryModal)
+    @if ($showWriteModal || $showSummaryModal || $showThemeModal)
         <div class="fixed inset-0 z-50 overflow-y-auto">
             <!-- Full-screen Backdrop -->
             <div class="fixed inset-0 bg-navy/40 backdrop-blur-sm transition-opacity" wire:click="closeModals" aria-hidden="true"></div>
@@ -193,6 +246,90 @@
                             <span wire:loading.remove wire:target="saveJournal">Save Journal</span>
                             <span wire:loading wire:target="saveJournal">Saving...</span>
                         </button>
+                    </div>
+                </section>
+            @endif
+
+            @if ($showThemeModal)
+                <section role="dialog" aria-modal="true" aria-labelledby="journal-theme-title" class="my-auto w-full max-w-[720px] rounded-[24px] border border-slate-200 bg-[#f8fafc] p-5 shadow-2xl sm:p-7">
+                    <div class="mb-5 flex items-start justify-between gap-4 border-b border-slate-200/80 pb-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-navy/5 text-base">🎨</span>
+                                <h2 id="journal-theme-title" class="text-xl sm:text-2xl font-black text-navy">Pilih Tema Jurnal</h2>
+                            </div>
+                            <p class="mt-1 text-xs sm:text-sm text-slate-500">Sesuaikan tampilan kartu catatan jurnal harian Anda dengan tema visual favorit.</p>
+                        </div>
+                        <button type="button" wire:click="closeModals" aria-label="Close" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-slate-200 text-navy transition hover:bg-slate-300">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[65vh] overflow-y-auto pr-1">
+                        @foreach ($availableJournalThemes as $themeKey => $theme)
+                            @php
+                                $isActive = ($activeJournalThemeKey === $themeKey);
+                                $isLocked = ($theme['is_premium'] && !auth()->user()->isPremium());
+                            @endphp
+                            <div class="relative flex flex-col justify-between rounded-2xl border-2 transition-all p-3.5 bg-white shadow-xs {{ $isActive ? 'border-navy ring-2 ring-navy/20 bg-slate-50/50' : ($isLocked ? 'border-slate-200 opacity-95' : 'border-slate-200 hover:border-slate-300 hover:shadow-sm') }}">
+                                <div>
+                                    <!-- Preview Image -->
+                                    <div class="relative aspect-[4/1] w-full rounded-xl overflow-hidden border border-slate-100 bg-slate-100 mb-3">
+                                        <img src="{{ asset($theme['preview']) }}" alt="{{ $theme['name'] }} preview" class="w-full h-full object-cover">
+
+                                        <!-- Top-Right Badge -->
+                                        <div class="absolute top-2 right-2 flex items-center gap-1">
+                                            @if ($isActive)
+                                                <span class="rounded-full bg-navy text-white text-[10px] font-extrabold px-2 py-0.5 shadow-sm flex items-center gap-1">
+                                                    <span>✓</span>
+                                                    <span>Aktif</span>
+                                                </span>
+                                            @elseif ($isLocked)
+                                                <span class="rounded-full bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 shadow-sm flex items-center gap-1">
+                                                    <span>🔒</span>
+                                                    <span>PRO</span>
+                                                </span>
+                                            @else
+                                                <span class="rounded-full bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 shadow-sm">
+                                                    Gratis
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <!-- Theme Name & Description -->
+                                    <div class="flex items-center gap-1.5 mb-1">
+                                        <span class="text-base">{{ $theme['icon'] }}</span>
+                                        <h3 class="text-sm font-bold text-navy">{{ $theme['name'] }}</h3>
+                                    </div>
+                                    <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">{{ $theme['description'] }}</p>
+                                </div>
+
+                                <!-- Action Button -->
+                                <div class="mt-4 pt-3 border-t border-slate-100">
+                                    @if ($isActive)
+                                        <button type="button" disabled class="w-full flex items-center justify-center gap-1.5 rounded-xl bg-slate-100 py-2 text-xs font-bold text-slate-500 cursor-default">
+                                            <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                            <span>Sedang Digunakan</span>
+                                        </button>
+                                    @elseif ($isLocked)
+                                        <a href="{{ route('premium') }}" class="w-full flex items-center justify-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 py-2 text-xs font-bold text-white shadow-xs transition">
+                                            <span>🔒</span>
+                                            <span>Buka dengan Premium</span>
+                                        </a>
+                                    @else
+                                        <button type="button" wire:click="selectTheme('{{ $themeKey }}')" wire:loading.attr="disabled" class="w-full flex items-center justify-center gap-1.5 rounded-xl bg-navy hover:bg-navy/90 py-2 text-xs font-bold text-white shadow-xs transition active:scale-[0.99] cursor-pointer">
+                                            <span>Gunakan Tema</span>
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <div class="mt-5 flex items-center justify-between text-xs text-slate-400 border-t border-slate-200/80 pt-3">
+                        <span>Pilihan tema akan langsung diterapkan ke seluruh catatan jurnal Anda.</span>
+                        <button type="button" wire:click="closeModals" class="font-bold text-navy hover:underline">Tutup</button>
                     </div>
                 </section>
             @endif

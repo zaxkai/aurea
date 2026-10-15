@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CheckInController;
+use App\Http\Controllers\JournalThemeController;
 use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\TreeSkinController;
 use App\Models\Tree;
@@ -53,6 +54,10 @@ Route::get('habit-growth-tree', function () {
 Route::post('habit-growth-tree/skin', [TreeSkinController::class, 'update'])
     ->middleware(['auth', 'verified', 'onboarding'])
     ->name('habit-growth-tree.skin');
+
+Route::post('journal/theme', [JournalThemeController::class, 'update'])
+    ->middleware(['auth', 'verified', 'onboarding'])
+    ->name('journal.theme.update');
 
 Route::view('ai-aurea', 'ai-aurea')
     ->middleware(['auth', 'verified', 'onboarding'])

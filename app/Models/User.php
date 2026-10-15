@@ -13,12 +13,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['first_name', 'last_name', 'name', 'email', 'password', 'google_id', 'avatar', 'current_streak', 'longest_streak', 'last_active_date', 'last_check_in_date', 'onboarding_completed_at', 'role'])]
+#[Fillable(['first_name', 'last_name', 'name', 'email', 'password', 'google_id', 'avatar', 'current_streak', 'longest_streak', 'last_active_date', 'last_check_in_date', 'onboarding_completed_at', 'role', 'journal_theme'])]
 #[Hidden(['password', 'remember_token', 'google_id'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    protected $attributes = [
+        'journal_theme' => 'default',
+    ];
 
     /**
      * Get the attributes that should be cast.
@@ -179,5 +183,79 @@ class User extends Authenticatable
         }
 
         return $profile;
+    }
+
+    public const AVAILABLE_JOURNAL_THEMES = [
+        'default' => [
+            'name' => 'Klasik Aurea',
+            'badge' => 'Default',
+            'is_premium' => false,
+            'description' => 'Desain minimalis bersih dengan maskot daun cyan ikonik Aurea.',
+            'preview' => 'images/journal/themes/default/preview.png',
+            'bg_image' => null,
+            'card_class' => 'bg-white border border-gray-100/60 shadow-sm',
+            'title_class' => 'text-navy',
+            'date_class' => 'text-slate-400',
+            'content_class' => 'text-slate-500',
+            'icon' => '🌿',
+            'bar_class' => null,
+            'bar_style' => null,
+            'date_badge' => null,
+        ],
+        'sakura' => [
+            'name' => 'Bunga Sakura',
+            'badge' => 'Premium',
+            'is_premium' => true,
+            'description' => 'Nuansa pastel pink hangat dengan cabang sakura mekar dan maskot sakura ceria.',
+            'preview' => 'images/journal/themes/sakura/preview.jpg',
+            'bg_image' => 'images/journal/themes/sakura/card-bg.jpg',
+            'card_class' => 'border border-pink-200/90 shadow-sm',
+            'title_class' => 'text-[#881337] font-bold',
+            'date_class' => 'text-[#475569] font-semibold',
+            'content_class' => 'text-[#334155]',
+            'icon' => '🌸',
+            'bar_class' => 'bg-[#e11d48]',
+            'bar_style' => null,
+            'date_badge' => '🌸',
+        ],
+        'natal' => [
+            'name' => 'Liburan Natal',
+            'badge' => 'Premium',
+            'is_premium' => true,
+            'description' => 'Nuansa pesta musim dingin dengan untaian lampu, candy cane, dan maskot cemara Santa.',
+            'preview' => 'images/journal/themes/natal/preview.jpg',
+            'bg_image' => 'images/journal/themes/natal/card-bg.jpg',
+            'card_class' => 'border border-amber-200/90 shadow-sm',
+            'title_class' => 'text-[#850e0e] font-extrabold',
+            'date_class' => 'text-[#166534] font-bold',
+            'content_class' => 'text-[#374151]',
+            'icon' => '🎄',
+            'bar_class' => null,
+            'bar_style' => 'background: repeating-linear-gradient(45deg, #dc2626, #dc2626 3px, #ffffff 3px, #ffffff 6px);',
+            'date_badge' => '🎄',
+        ],
+        'hujan' => [
+            'name' => 'Musim Hujan',
+            'badge' => 'Premium',
+            'is_premium' => true,
+            'description' => 'Nuansa tenang rintik hujan dengan perahu kertas dan maskot awan berjas hujan.',
+            'preview' => 'images/journal/themes/hujan/preview.jpg',
+            'bg_image' => 'images/journal/themes/hujan/card-bg.jpg',
+            'card_class' => 'border border-sky-200/90 shadow-sm',
+            'title_class' => 'text-[#0f172a] font-bold',
+            'date_class' => 'text-[#0369a1] font-semibold',
+            'content_class' => 'text-[#334155]',
+            'icon' => '🌧️',
+            'bar_class' => 'bg-[#0284c7]',
+            'bar_style' => null,
+            'date_badge' => '🌧️',
+        ],
+    ];
+
+    public function getJournalThemeDetails(): array
+    {
+        $theme = $this->journal_theme ?? 'default';
+
+        return self::AVAILABLE_JOURNAL_THEMES[$theme] ?? self::AVAILABLE_JOURNAL_THEMES['default'];
     }
 }

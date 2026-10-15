@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Journal;
+use App\Models\User;
 use App\Notifications\AppNotification;
 use App\Services\ChatbotService;
 use Illuminate\Contracts\View\View;
@@ -20,6 +21,8 @@ class JournalPage extends Component
     public bool $showWriteModal = false;
 
     public bool $showSummaryModal = false;
+
+    public bool $showThemeModal = false;
 
     public string $mood = 'neutral';
 
@@ -91,6 +94,7 @@ class JournalPage extends Component
     {
         $this->showWriteModal = false;
         $this->showSummaryModal = false;
+        $this->showThemeModal = false;
         $this->resetValidation();
     }
 
@@ -158,6 +162,38 @@ class JournalPage extends Component
         session()->flash('journal-saved', 'Your journal has been saved.');
     }
 
+    public function openThemeModal(): void
+    {
+        $this->showThemeModal = true;
+    }
+
+    public function closeThemeModal(): void
+    {
+        $this->showThemeModal = false;
+    }
+
+    public function selectTheme(string $theme): void
+    {
+        $available = User::AVAILABLE_JOURNAL_THEMES;
+        if (! array_key_exists($theme, $available)) {
+            return;
+        }
+
+        $config = $available[$theme];
+        /** @var User $user */
+        $user = auth()->user();
+
+        if ($config['is_premium'] && ! $user->isPremium()) {
+            $this->redirect(route('premium'));
+
+            return;
+        }
+
+        $user->update(['journal_theme' => $theme]);
+        $this->showThemeModal = false;
+        session()->flash('journal-theme-updated', "Tema jurnal berhasil diubah menjadi {$config['name']}!");
+    }
+
     public function clearSearch(): void
     {
         $this->search = '';
@@ -166,7 +202,10 @@ class JournalPage extends Component
 
     public function render(): View
     {
-        $allJournals = auth()->user()->journals()
+        /** @var User $user */
+        $user = auth()->user();
+
+        $allJournals = $user->journals()
             ->latest('created_at')
             ->limit(50)
             ->get();
@@ -208,6 +247,9 @@ class JournalPage extends Component
             'journals' => $filteredJournals,
             'chartPoints' => $chartPoints,
             'highlightedJournalId' => $this->highlight,
+            'activeJournalTheme' => $user->getJournalThemeDetails(),
+            'activeJournalThemeKey' => $user->journal_theme ?? 'default',
+            'availableJournalThemes' => User::AVAILABLE_JOURNAL_THEMES,
         ]);
     }
 }
