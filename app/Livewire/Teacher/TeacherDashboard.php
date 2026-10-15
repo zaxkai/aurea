@@ -4,6 +4,7 @@ namespace App\Livewire\Teacher;
 
 use App\Models\CheckIn;
 use App\Models\Classroom;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -12,6 +13,10 @@ class TeacherDashboard extends Component
     public ?int $selectedClassroomId = null;
 
     public bool $showCreateModal = false;
+
+    public bool $showSubscriptionModal = false;
+
+    public string $selectedPlan = 'semester';
 
     public string $newClassName = '';
 
@@ -22,6 +27,42 @@ class TeacherDashboard extends Component
     public function boot(): void
     {
         abort_unless(auth()->user()?->isTeacher(), 403);
+    }
+
+    public function openSubscriptionModal(): void
+    {
+        $this->showSubscriptionModal = true;
+    }
+
+    public function closeSubscriptionModal(): void
+    {
+        $this->showSubscriptionModal = false;
+    }
+
+    public function selectPlan(string $plan): void
+    {
+        if (in_array($plan, ['semester', 'yearly'])) {
+            $this->selectedPlan = $plan;
+        }
+    }
+
+    public function activateDemoSubscription(): void
+    {
+        /** @var User $teacher */
+        $teacher = auth()->user();
+        $teacher->activatePremium();
+
+        $this->showSubscriptionModal = false;
+        session()->flash('success', 'Paket Berlangganan Sekolah berhasil diaktifkan melalui simulasi demo!');
+    }
+
+    public function resetDemoSubscription(): void
+    {
+        /** @var User $teacher */
+        $teacher = auth()->user();
+        $teacher->deactivatePremium();
+
+        session()->flash('info', 'Status akun guru dikembalikan ke Akun Free untuk simulasi demo.');
     }
 
     public function createClassroom(): void

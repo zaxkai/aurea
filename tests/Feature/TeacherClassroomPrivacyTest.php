@@ -141,3 +141,47 @@ it('allows user to log out from settings', function () {
 
     $this->assertGuest();
 });
+
+it('displays B2B paywall for free teachers and unlocks upon demo subscription activation', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+
+    // 1. Free teacher initially sees paywall disclaimer and lock indicators
+    $component = Livewire::actingAs($teacher)
+        ->test(TeacherDashboard::class)
+        ->assertSee('B2B (Sekolah) • Layanan Berbayar')
+        ->assertSee('Deteksi Dini', false)
+        ->assertSee('Buka Paket Berlangganan');
+
+    expect($teacher->fresh()->isPremium())->toBeFalse();
+
+    // 2. Open subscription modal and verify paid service in demo stage disclaimer
+    $component->call('openSubscriptionModal')
+        ->assertSet('showSubscriptionModal', true)
+        ->assertSee('Layanan Berlangganan Berbayar (Tahap Uji Coba Demo)')
+        ->call('selectPlan', 'yearly')
+        ->assertSet('selectedPlan', 'yearly')
+        ->call('activateDemoSubscription')
+        ->assertSet('showSubscriptionModal', false)
+        ->assertSee('Paket B2B Sekolah Aktif');
+
+    expect($teacher->fresh()->isPremium())->toBeTrue();
+
+    // 3. Reset demo subscription back to free
+    $component->call('resetDemoSubscription')
+        ->assertSee('Akun Free • Berlangganan B2B');
+
+    expect($teacher->fresh()->isPremium())->toBeFalse();
+});
+
+it('displays paywall on student wellbeing page for free teachers and unlocks when subscribed', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+
+    Livewire::actingAs($teacher)
+        ->test(StudentWellbeing::class)
+        ->assertSee('Deteksi Dini Siswa Terkunci')
+        ->assertSee('Buka Paket Berlangganan')
+        ->call('activateDemoSubscription')
+        ->assertSee('Paket B2B Sekolah Aktif');
+
+    expect($teacher->fresh()->isPremium())->toBeTrue();
+});
