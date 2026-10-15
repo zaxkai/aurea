@@ -23,11 +23,11 @@ class JournalThemeController extends Controller
         $user = auth()->user();
 
         if ($themeConfig['is_premium'] && ! $user->isPremium()) {
-            return back()->with('error', 'Tema jurnal ini merupakan fitur eksklusif Aurea Premium. Silakan aktifkan Premium terlebih dahulu!');
+            return back()->with('error', 'This journal theme is an exclusive Aurea Premium feature. Please activate Premium first!');
         }
 
         $user->update(['journal_theme' => $selectedTheme]);
 
-        return back()->with('success', "Tema jurnal berhasil diubah menjadi {$themeConfig['name']}!");
+        return back()->with('success', "Journal theme changed to {$themeConfig['name']} successfully!");
     }
 }

@@ -42,7 +42,7 @@
         <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h1 class="text-3xl font-extrabold text-navy tracking-tight">Habit Growth Tree</h1>
-                <p class="mt-1 text-sm text-gray-500">Setiap kebiasaan dan tugas yang kamu selesaikan membantu pohon ketahanan dirimu bertumbuh dan mekar.</p>
+                <p class="mt-1 text-sm text-gray-500">Every habit and task you complete helps your personal resilience tree grow and blossom.</p>
             </div>
 
             <!-- Kostumisasi Skin Button in Header -->
@@ -50,7 +50,7 @@
                     @click="showSkinModal = true"
                     class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white border border-amber-300 hover:bg-amber-50/60 text-xs font-bold text-navy shadow-xs transition-all active:scale-95 self-start sm:self-auto cursor-pointer">
                 <span>🎨</span>
-                <span>Ganti Skin Pohon</span>
+                <span>Change Tree Skin</span>
                 @if (auth()->user()->isPremium())
                     <span class="rounded-full bg-emerald-100 text-emerald-800 px-2 py-0.5 text-[10px] font-black">PRO</span>
                 @else
@@ -79,8 +79,8 @@
                         @click="showSkinModal = true"
                         class="mt-2 inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-gray-50 hover:bg-amber-50 border border-gray-200 hover:border-amber-300 text-xs font-bold text-gray-700 hover:text-navy transition-all active:scale-95 cursor-pointer">
                     <span>🎨</span>
-                    <span>Tema: <strong>{{ $availableSkins[$currentSkin]['name'] ?? 'Klasik' }}</strong></span>
-                    <span class="text-gray-400 font-normal underline text-[11px]">(Ubah Skin)</span>
+                    <span>Theme: <strong>{{ $availableSkins[$currentSkin]['name'] ?? 'Classic Aurea' }}</strong></span>
+                    <span class="text-gray-400 font-normal underline text-[11px]">(Change Skin)</span>
                 </button>
 
                 <p class="mt-3 text-sm text-gray-500">{{ $currentStage['description'] }}</p>
@@ -176,10 +176,10 @@
                         <div>
                             <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 uppercase tracking-wider mb-2">
                                 <span>🎨</span>
-                                <span>Koleksi Skin Pohon Eksklusif</span>
+                                <span>Exclusive Tree Skin Collection</span>
                             </div>
-                            <h3 class="text-2xl font-black text-[#000F2E] tracking-tight">Kostumisasi Tampilan Pohon</h3>
-                            <p class="text-xs text-gray-500 mt-1">Pilih tema pohon favoritmu untuk merefleksikan proses bertumbuh dan konsistensi kebiasaanmu.</p>
+                            <h3 class="text-2xl font-black text-[#000F2E] tracking-tight">Customize Tree Appearance</h3>
+                            <p class="text-xs text-gray-500 mt-1">Choose your favorite tree theme to reflect your personal growth and habit consistency.</p>
                         </div>
                         <button type="button"
                                 @click="showSkinModal = false"
@@ -194,20 +194,20 @@
                             <div class="text-xs text-gray-700 leading-relaxed text-center sm:text-left">
                                 <span class="font-bold text-[#000F2E] flex items-center gap-1.5 justify-center sm:justify-start">
                                     <span>⭐</span>
-                                    <span>Fitur Eksklusif Murid Premium</span>
+                                    <span>Exclusive Premium Feature</span>
                                 </span>
-                                <p class="text-gray-500 mt-0.5">Aktifkan Aurea Premium untuk membuka kebebasan memakai semua skin pohon (Sakura, Cemara, Musim Gugur, Natal, dan Apel Buah).</p>
+                                <p class="text-gray-500 mt-0.5">Upgrade to Aurea Premium to unlock all tree themes (Cherry Blossom, Pine Tree, Autumn, Christmas, and Fruit Tree).</p>
                             </div>
                             <a href="{{ route('premium') }}"
                                class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#000F2E] text-white font-bold text-xs hover:bg-[#001744] transition-all shadow-md shrink-0">
                                 <span>⭐</span>
-                                <span>Buka Semua Skin (Premium)</span>
+                                <span>Unlock All Skins (Premium)</span>
                             </a>
                         </div>
                     @else
                         <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 flex items-center gap-2.5 text-xs text-emerald-900">
                             <span class="text-base">✨</span>
-                            <span><strong>Status Premium Aktif:</strong> Kamu bebas memilih dan berganti skin pohon kapan saja!</span>
+                            <span><strong>Premium Active:</strong> You can freely choose and switch your tree skin anytime!</span>
                         </div>
                     @endif
 
@@ -224,10 +224,10 @@
                             <div class="relative rounded-2xl border-2 p-4 flex flex-col justify-between transition-all bg-white {{ $isActive ? 'border-[#000F2E] ring-2 ring-[#000F2E]/20 shadow-md bg-blue-50/20' : 'border-gray-200 hover:border-gray-300 shadow-2xs' }}">
                                 @if ($isActive)
                                     <span class="absolute top-2.5 right-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#000F2E] text-white shadow-2xs">
-                                        Aktif
+                                        Active
                                     </span>
                                 @elseif ($isLocked)
-                                    <span class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-300">
+                                    <span class="absolute top-2.5 right-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-300">
                                         🔒 PRO
                                     </span>
                                 @endif
@@ -250,24 +250,24 @@
                                 <div class="pt-4 mt-auto">
                                     @if ($isActive)
                                         <button type="button" disabled class="w-full py-2 px-3 rounded-xl bg-emerald-100 text-emerald-800 font-bold text-xs text-center cursor-default">
-                                            ✓ Sedang Digunakan
+                                            ✓ In Use
                                         </button>
                                     @elseif ($isLocked)
                                         <a href="{{ route('premium') }}"
                                            class="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs text-center transition-colors">
                                             <span>🔒</span>
-                                            <span>Buka dengan Premium</span>
+                                            <span>Unlock with Premium</span>
                                         </a>
                                     @else
                                         <form method="POST" action="{{ route('habit-growth-tree.skin') }}">
                                             @csrf
-                                            <input type="hidden" name="skin" value="{{ $key }}">
-                                            <button type="submit"
-                                                    class="w-full py-2 px-3 rounded-xl bg-[#000F2E] hover:bg-[#001744] text-white font-bold text-xs text-center transition-all active:scale-95 shadow-xs cursor-pointer">
-                                                Gunakan Skin Ini
-                                            </button>
-                                        </form>
-                                    @endif
+                                             <input type="hidden" name="skin" value="{{ $key }}">
+                                             <button type="submit"
+                                                     class="w-full py-2 px-3 rounded-xl bg-[#000F2E] hover:bg-[#001744] text-white font-bold text-xs text-center transition-all active:scale-95 shadow-xs cursor-pointer">
+                                                 Use This Skin
+                                             </button>
+                                         </form>
+                                     @endif
                                 </div>
                             </div>
                         @endforeach
@@ -277,7 +277,7 @@
                         <button type="button"
                                 @click="showSkinModal = false"
                                 class="px-5 py-2.5 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer">
-                            Tutup
+                            Close
                         </button>
                     </div>
                 </div>

@@ -10,7 +10,7 @@
                     wire:click="openThemeModal"
                     class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-navy shadow-xs transition hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-aurea focus:ring-offset-2">
                 <span class="text-sm leading-none">{{ $activeJournalTheme['icon'] ?? '🎨' }}</span>
-                <span>Tema Jurnal</span>
+                <span>Journal Theme</span>
                 @if (auth()->user()->isPremium())
                     <span class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-black text-amber-800 uppercase tracking-wide">PRO</span>
                 @endif
@@ -256,9 +256,9 @@
                         <div>
                             <div class="flex items-center gap-2">
                                 <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-navy/5 text-base">🎨</span>
-                                <h2 id="journal-theme-title" class="text-xl sm:text-2xl font-black text-navy">Pilih Tema Jurnal</h2>
+                                <h2 id="journal-theme-title" class="text-xl sm:text-2xl font-black text-navy">Choose Journal Theme</h2>
                             </div>
-                            <p class="mt-1 text-xs sm:text-sm text-slate-500">Sesuaikan tampilan kartu catatan jurnal harian Anda dengan tema visual favorit.</p>
+                            <p class="mt-1 text-xs sm:text-sm text-slate-500">Customize your daily journal cards with your favorite visual theme.</p>
                         </div>
                         <button type="button" wire:click="closeModals" aria-label="Close" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-slate-200 text-navy transition hover:bg-slate-300">
                             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
@@ -282,7 +282,7 @@
                                             @if ($isActive)
                                                 <span class="rounded-full bg-navy text-white text-[10px] font-extrabold px-2 py-0.5 shadow-sm flex items-center gap-1">
                                                     <span>✓</span>
-                                                    <span>Aktif</span>
+                                                    <span>Active</span>
                                                 </span>
                                             @elseif ($isLocked)
                                                 <span class="rounded-full bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 shadow-sm flex items-center gap-1">
@@ -291,7 +291,7 @@
                                                 </span>
                                             @else
                                                 <span class="rounded-full bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 shadow-sm">
-                                                    Gratis
+                                                    Free
                                                 </span>
                                             @endif
                                         </div>
@@ -310,16 +310,16 @@
                                     @if ($isActive)
                                         <button type="button" disabled class="w-full flex items-center justify-center gap-1.5 rounded-xl bg-slate-100 py-2 text-xs font-bold text-slate-500 cursor-default">
                                             <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                            <span>Sedang Digunakan</span>
+                                            <span>✓ In Use</span>
                                         </button>
                                     @elseif ($isLocked)
                                         <a href="{{ route('premium') }}" class="w-full flex items-center justify-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 py-2 text-xs font-bold text-white shadow-xs transition">
                                             <span>🔒</span>
-                                            <span>Buka dengan Premium</span>
+                                            <span>Unlock with Premium</span>
                                         </a>
                                     @else
                                         <button type="button" wire:click="selectTheme('{{ $themeKey }}')" wire:loading.attr="disabled" class="w-full flex items-center justify-center gap-1.5 rounded-xl bg-navy hover:bg-navy/90 py-2 text-xs font-bold text-white shadow-xs transition active:scale-[0.99] cursor-pointer">
-                                            <span>Gunakan Tema</span>
+                                            <span>Use This Theme</span>
                                         </button>
                                     @endif
                                 </div>
@@ -328,8 +328,8 @@
                     </div>
 
                     <div class="mt-5 flex items-center justify-between text-xs text-slate-400 border-t border-slate-200/80 pt-3">
-                        <span>Pilihan tema akan langsung diterapkan ke seluruh catatan jurnal Anda.</span>
-                        <button type="button" wire:click="closeModals" class="font-bold text-navy hover:underline">Tutup</button>
+                        <span>Your selected theme will be applied to all your journal cards.</span>
+                        <button type="button" wire:click="closeModals" class="font-bold text-navy hover:underline">Close</button>
                     </div>
                 </section>
             @endif

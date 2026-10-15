@@ -22,12 +22,12 @@ class TreeSkinController extends Controller
         $user = auth()->user();
 
         if ($skinConfig['is_premium'] && ! $user->isPremium()) {
-            return back()->with('error', 'Skin pohon ini merupakan fitur eksklusif Aurea Premium. Silakan aktifkan Premium terlebih dahulu!');
+            return back()->with('error', 'This tree skin is an exclusive Aurea Premium feature. Please activate Premium first!');
         }
 
         $tree = $user->tree()->firstOrCreate([], ['growth_percentage' => 30]);
         $tree->update(['skin' => $selectedSkin]);
 
-        return back()->with('success', "Skin pohon berhasil diubah menjadi {$skinConfig['name']}!");
+        return back()->with('success', "Tree skin changed to {$skinConfig['name']} successfully!");
     }
 }

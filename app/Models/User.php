@@ -187,10 +187,10 @@ class User extends Authenticatable
 
     public const AVAILABLE_JOURNAL_THEMES = [
         'default' => [
-            'name' => 'Klasik Aurea',
+            'name' => 'Classic Aurea',
             'badge' => 'Default',
             'is_premium' => false,
-            'description' => 'Desain minimalis bersih dengan maskot daun cyan ikonik Aurea.',
+            'description' => 'Clean minimalist card design with Aurea\'s iconic cyan leaf mascot.',
             'preview' => 'images/journal/themes/default/preview.png',
             'bg_image' => null,
             'card_class' => 'bg-white border border-gray-100/60 shadow-sm',
@@ -203,10 +203,10 @@ class User extends Authenticatable
             'date_badge' => null,
         ],
         'sakura' => [
-            'name' => 'Bunga Sakura',
+            'name' => 'Cherry Blossom',
             'badge' => 'Premium',
             'is_premium' => true,
-            'description' => 'Nuansa pastel pink hangat dengan cabang sakura mekar dan maskot sakura ceria.',
+            'description' => 'Warm pastel pink aesthetics with blooming sakura branches and a cheerful sakura mascot.',
             'preview' => 'images/journal/themes/sakura/preview.jpg',
             'bg_image' => 'images/journal/themes/sakura/card-bg.jpg',
             'card_class' => 'border border-pink-200/90 shadow-sm',
@@ -219,10 +219,10 @@ class User extends Authenticatable
             'date_badge' => '🌸',
         ],
         'natal' => [
-            'name' => 'Liburan Natal',
+            'name' => 'Christmas Holiday',
             'badge' => 'Premium',
             'is_premium' => true,
-            'description' => 'Nuansa pesta musim dingin dengan untaian lampu, candy cane, dan maskot cemara Santa.',
+            'description' => 'Festive winter holiday mood with glowing fairy lights, candy cane stripes, and Santa pine mascot.',
             'preview' => 'images/journal/themes/natal/preview.jpg',
             'bg_image' => 'images/journal/themes/natal/card-bg.jpg',
             'card_class' => 'border border-amber-200/90 shadow-sm',
@@ -235,10 +235,10 @@ class User extends Authenticatable
             'date_badge' => '🎄',
         ],
         'hujan' => [
-            'name' => 'Musim Hujan',
+            'name' => 'Rainy Season',
             'badge' => 'Premium',
             'is_premium' => true,
-            'description' => 'Nuansa tenang rintik hujan dengan perahu kertas dan maskot awan berjas hujan.',
+            'description' => 'Calm soothing rain ambiance with origami paper boats and a cute cloud mascot in yellow raincoat.',
             'preview' => 'images/journal/themes/hujan/preview.jpg',
             'bg_image' => 'images/journal/themes/hujan/card-bg.jpg',
             'card_class' => 'border border-sky-200/90 shadow-sm',

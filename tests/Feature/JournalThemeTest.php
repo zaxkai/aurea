@@ -11,7 +11,7 @@ it('defaults student journal theme to default', function () {
     ]);
 
     expect($user->journal_theme)->toBe('default');
-    expect($user->getJournalThemeDetails()['name'])->toBe('Klasik Aurea');
+    expect($user->getJournalThemeDetails()['name'])->toBe('Classic Aurea');
 });
 
 it('prevents free students from choosing premium journal themes', function (string $themeKey) {
@@ -84,10 +84,10 @@ it('allows premium students to select any journal theme', function (string $them
         $response->assertSee(asset("images/journal/themes/{$themeKey}/card-bg.jpg"), false);
     }
 })->with([
-    'sakura' => ['sakura', 'Bunga Sakura'],
-    'natal' => ['natal', 'Liburan Natal'],
-    'hujan' => ['hujan', 'Musim Hujan'],
-    'default' => ['default', 'Klasik Aurea'],
+    'sakura' => ['sakura', 'Cherry Blossom'],
+    'natal' => ['natal', 'Christmas Holiday'],
+    'hujan' => ['hujan', 'Rainy Season'],
+    'default' => ['default', 'Classic Aurea'],
 ]);
 
 it('allows theme selection via Livewire component', function () {
@@ -102,7 +102,7 @@ it('allows theme selection via Livewire component', function () {
         ->assertSet('showThemeModal', true)
         ->call('selectTheme', 'sakura')
         ->assertSet('showThemeModal', false)
-        ->assertSee('Tema jurnal berhasil diubah menjadi Bunga Sakura!');
+        ->assertSee('Journal theme changed to Cherry Blossom successfully!');
 
     expect($user->fresh()->journal_theme)->toBe('sakura');
 });

@@ -191,7 +191,7 @@ class JournalPage extends Component
 
         $user->update(['journal_theme' => $theme]);
         $this->showThemeModal = false;
-        session()->flash('journal-theme-updated', "Tema jurnal berhasil diubah menjadi {$config['name']}!");
+        session()->flash('journal-theme-updated', "Journal theme changed to {$config['name']} successfully!");
     }
 
     public function clearSearch(): void

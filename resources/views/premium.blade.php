@@ -121,8 +121,8 @@
                                 <li class="flex gap-2"><span aria-hidden="true">✦</span><span>Track as many habits as you need</span></li>
                                 <li class="flex gap-2"><span aria-hidden="true">✦</span><span>View weekly and monthly analytics</span></li>
                                 <li class="flex gap-2"><span aria-hidden="true">✦</span><span>Smart reminders tailored to your routine</span></li>
-                                <li class="flex gap-2"><span aria-hidden="true">✦</span><span><strong>Kostumisasi Skin Pohon:</strong> Bebas pilih tema pohon (Sakura, Cemara, Musim Gugur, Natal, Apel Buah) di Habit Growth Tree</span></li>
-                                <li class="flex gap-2"><span aria-hidden="true">✦</span><span><strong>Kostumisasi Skin Tema Jurnal:</strong> Bebas pilih tema visual catatan jurnal (Bunga Sakura, Liburan Natal, Musim Hujan) lengkap dengan artwork & maskot eksklusif</span></li>
+                                <li class="flex gap-2"><span aria-hidden="true">✦</span><span><strong>Tree Skin Customization:</strong> Freely choose your favorite tree theme (Sakura, Pine, Autumn, Christmas, Fruit Apple) in Habit Growth Tree</span></li>
+                                <li class="flex gap-2"><span aria-hidden="true">✦</span><span><strong>Journal Theme Customization:</strong> Freely customize your journal cards with exclusive visual themes (Cherry Blossom, Christmas Holiday, Rainy Season) complete with custom artwork and mascots</span></li>
                             </ul>
                         </div>
                         <img src="{{ asset('images/maskot_aurea.png') }}" alt="Aurea Mascot" class="mx-auto h-36 w-20 max-w-full object-contain sm:h-44 sm:w-24">
@@ -138,12 +138,12 @@
                             <div class="flex flex-wrap items-center justify-center gap-3 mt-0.5">
                                 <a href="{{ route('habit-growth-tree') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-navy hover:underline">
                                     <span>🎨</span>
-                                    <span>Kostumisasi Skin Pohon →</span>
+                                    <span>Customize Tree Skin →</span>
                                 </a>
                                 <span class="text-xs text-slate-400">•</span>
                                 <a href="{{ route('journal') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-navy hover:underline">
                                     <span>📖</span>
-                                    <span>Kostumisasi Tema Jurnal →</span>
+                                    <span>Customize Journal Theme →</span>
                                 </a>
                             </div>
                         @else

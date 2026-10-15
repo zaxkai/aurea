@@ -206,11 +206,11 @@ it('allows premium students to customize tree skins and renders the custom skin'
         ->assertSee("tree-leaf--{$skinKey}", false)
         ->assertSee($skinName);
 })->with([
-    'sakura' => ['sakura', 'Bunga Sakura'],
-    'cemara' => ['cemara', 'Pohon Cemara'],
-    'gugur' => ['gugur', 'Musim Gugur'],
-    'natal' => ['natal', 'Pohon Natal'],
-    'buah' => ['buah', 'Pohon Apel Buah'],
+    'sakura' => ['sakura', 'Cherry Blossom'],
+    'cemara' => ['cemara', 'Pine Tree'],
+    'gugur' => ['gugur', 'Autumn Season'],
+    'natal' => ['natal', 'Christmas Tree'],
+    'buah' => ['buah', 'Apple Fruit Tree'],
 ]);
 
 it('allows premium students to switch back to default skin', function () {

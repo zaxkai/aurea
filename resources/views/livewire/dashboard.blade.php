@@ -303,7 +303,7 @@
                         <span class="text-gray-300">•</span>
                         <a href="{{ route('habit-growth-tree') }}" class="text-xs font-bold text-[#008e95] hover:text-navy inline-flex items-center gap-1 transition">
                             <span>🎨</span>
-                            <span>Ganti Skin</span>
+                            <span>Change Skin</span>
                         </a>
                     </div>
                 </div>
