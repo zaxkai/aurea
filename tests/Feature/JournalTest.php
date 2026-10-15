@@ -107,3 +107,31 @@ it('requires a valid mood and journal entry before requesting a summary', functi
 
     expect(Journal::query()->count())->toBe(0);
 });
+
+it('allows a user to open their journal and view what they wrote along with AI recommendations', function () {
+    $user = User::factory()->create();
+
+    $journal = $user->journals()->create([
+        'title' => 'A brighter day',
+        'content' => 'Aku lagi seneng banget nih karena ujian selesai.',
+        'mood' => 'energetic',
+        'summary' => 'Kamu merasa sangat senang karena ujian telah selesai.',
+        'advice' => 'Nikmati momen keberhasilan ini dan istirahatlah yang cukup.',
+        'journal_date' => today(),
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(JournalPage::class)
+        ->assertSee('A brighter day')
+        ->assertSee('Aku lagi seneng banget nih')
+        ->call('openDetailModal', $journal->id)
+        ->assertSet('showDetailModal', true)
+        ->assertSee('Your Journal Entry')
+        ->assertSee('Aku lagi seneng banget nih karena ujian selesai.')
+        ->assertSee('AI Key Takeaways')
+        ->assertSee('Kamu merasa sangat senang karena ujian telah selesai.')
+        ->assertSee('AI Recommendation and Advice')
+        ->assertSee('Nikmati momen keberhasilan ini dan istirahatlah yang cukup.')
+        ->call('closeModals')
+        ->assertSet('showDetailModal', false);
+});

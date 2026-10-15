@@ -24,6 +24,10 @@ class JournalPage extends Component
 
     public bool $showThemeModal = false;
 
+    public bool $showDetailModal = false;
+
+    public ?Journal $selectedJournal = null;
+
     public string $mood = 'neutral';
 
     public string $content = '';
@@ -90,11 +94,32 @@ class JournalPage extends Component
         $this->showWriteModal = true;
     }
 
+    public function openDetailModal(int $journalId): void
+    {
+        /** @var User $user */
+        $user = auth()->user();
+        $journal = $user->journals()->find($journalId);
+        if (! $journal) {
+            return;
+        }
+
+        $this->selectedJournal = $journal;
+        $this->showDetailModal = true;
+    }
+
+    public function closeDetailModal(): void
+    {
+        $this->showDetailModal = false;
+        $this->selectedJournal = null;
+    }
+
     public function closeModals(): void
     {
         $this->showWriteModal = false;
         $this->showSummaryModal = false;
         $this->showThemeModal = false;
+        $this->showDetailModal = false;
+        $this->selectedJournal = null;
         $this->resetValidation();
     }
 

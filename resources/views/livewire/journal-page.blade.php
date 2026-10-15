@@ -113,7 +113,10 @@
             @endphp
             @if ($isDefaultTheme)
                 <article wire:key="journal-{{ $journal->id }}"
-                         class="group flex min-h-[88px] items-center justify-between gap-4 rounded-2xl bg-white px-5 py-3.5 shadow-xs md:px-6 transition-all {{ $isHighlighted ? 'ring-2 ring-aurea shadow-md bg-cyan-50/30' : 'border border-gray-100/60 hover:shadow-sm hover:border-gray-200' }}">
+                         wire:click="openDetailModal({{ $journal->id }})"
+                         role="button"
+                         tabindex="0"
+                         class="group flex min-h-[88px] items-center justify-between gap-4 rounded-2xl bg-white px-5 py-3.5 shadow-xs md:px-6 transition-all cursor-pointer hover:shadow-md hover:scale-[1.005] active:scale-[0.995] {{ $isHighlighted ? 'ring-2 ring-aurea shadow-md bg-cyan-50/30' : 'border border-gray-100/60 hover:border-gray-200' }}">
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-2">
                             <p class="text-[11px] font-medium text-slate-400">{{ ($journal->journal_date ?? $journal->created_at)->format('F j, Y') }}</p>
@@ -126,12 +129,19 @@
                             <span class="truncate">{{ $journal->title }}</span>
                         </h3>
                         <p class="mt-0.5 line-clamp-2 text-xs text-slate-500">“{{ \Illuminate\Support\Str::limit($journal->content, 180) }}”</p>
+                        <div class="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-slate-400 group-hover:text-navy transition-colors">
+                            <span>Read entry & AI advice</span>
+                            <span class="transition-transform group-hover:translate-x-0.5">→</span>
+                        </div>
                     </div>
                     <img src="{{ asset('images/journal/'.$moodData['mascot']) }}" alt="{{ $moodData['label'] }} mood" class="h-16 w-16 shrink-0 object-contain transition-transform duration-200 group-hover:scale-105" loading="lazy">
                 </article>
             @else
                 <article wire:key="journal-{{ $journal->id }}"
-                         class="group relative flex min-h-[96px] sm:min-h-[104px] items-center justify-between gap-4 rounded-2xl {{ $activeJournalTheme['card_class'] }} px-5 py-4 sm:px-6 sm:py-5 transition-all overflow-hidden {{ $isHighlighted ? 'ring-2 ring-aurea shadow-md scale-[1.01]' : '' }}">
+                         wire:click="openDetailModal({{ $journal->id }})"
+                         role="button"
+                         tabindex="0"
+                         class="group relative flex min-h-[96px] sm:min-h-[104px] items-center justify-between gap-4 rounded-2xl {{ $activeJournalTheme['card_class'] }} px-5 py-4 sm:px-6 sm:py-5 transition-all overflow-hidden cursor-pointer hover:shadow-md hover:scale-[1.005] active:scale-[0.995] {{ $isHighlighted ? 'ring-2 ring-aurea shadow-md scale-[1.01]' : '' }}">
 
                     {{-- Atmospheric FX Layer --}}
                     @if (!empty($activeJournalTheme['fx_type']))
@@ -192,6 +202,10 @@
                             <span class="truncate">{{ $journal->title }}</span>
                         </h3>
                         <p class="mt-1 line-clamp-2 text-xs {{ $activeJournalTheme['content_class'] }}">“{{ \Illuminate\Support\Str::limit($journal->content, 180) }}”</p>
+                        <div class="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-slate-500/80 group-hover:text-slate-900 transition-colors">
+                            <span>Read entry & AI advice</span>
+                            <span class="transition-transform group-hover:translate-x-0.5">→</span>
+                        </div>
                     </div>
 
                     {{-- Clean Themed Mascot Medallion --}}
@@ -227,7 +241,7 @@
         @endforelse
     </section>
 
-    @if ($showWriteModal || $showSummaryModal || $showThemeModal)
+    @if ($showWriteModal || $showSummaryModal || $showThemeModal || $showDetailModal)
         <div class="fixed inset-0 z-50 overflow-y-auto">
             <!-- Full-screen Backdrop -->
             <div class="fixed inset-0 bg-navy/40 backdrop-blur-sm transition-opacity" wire:click="closeModals" aria-hidden="true"></div>
@@ -440,6 +454,86 @@
                     <div class="mt-5 flex items-center justify-between text-xs text-slate-400 border-t border-slate-200/80 pt-3">
                         <span>Your selected theme will be applied to all your journal cards.</span>
                         <button type="button" wire:click="closeModals" class="font-bold text-navy hover:underline">Close</button>
+                    </div>
+                </section>
+            @endif
+
+            @if ($showDetailModal && $selectedJournal)
+                @php
+                    $detailMood = $moods[$selectedJournal->mood] ?? $moods['neutral'];
+                @endphp
+                <section role="dialog" aria-modal="true" aria-labelledby="journal-detail-title" class="my-auto w-full max-w-[560px] rounded-[24px] border border-slate-200 bg-[#f8fafc] p-5 shadow-2xl sm:p-7 transition-all">
+                    <!-- Modal Header -->
+                    <div class="mb-5 flex items-start justify-between gap-4 border-b border-slate-200/80 pb-4">
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="text-xs font-semibold text-slate-400">
+                                    {{ ($selectedJournal->journal_date ?? $selectedJournal->created_at)->format('l, F j, Y') }}
+                                </span>
+                                <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold {{ $detailMood['background'] }} text-navy">
+                                    <span class="text-xs">{{ $detailMood['emoji'] }}</span>
+                                    <span>{{ $detailMood['label'] }}</span>
+                                </span>
+                            </div>
+                            <h2 id="journal-detail-title" class="mt-2 text-xl sm:text-2xl font-bold text-navy flex items-center gap-2 truncate">
+                                <span class="h-4 w-1.5 shrink-0 rounded-full {{ $detailMood['background'] }}" aria-hidden="true"></span>
+                                <span class="truncate">{{ $selectedJournal->title }}</span>
+                            </h2>
+                        </div>
+                        <button type="button" wire:click="closeModals" aria-label="Close" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-slate-200 text-navy transition hover:bg-slate-300 cursor-pointer">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+                        </button>
+                    </div>
+
+                    <div class="space-y-4 max-h-[68vh] overflow-y-auto pr-1">
+                        <!-- What User Wrote -->
+                        <div class="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-2xs">
+                            <div class="flex items-center gap-2 mb-2 text-slate-500">
+                                <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Your Journal Entry</h3>
+                            </div>
+                            <p class="whitespace-pre-line text-sm sm:text-base leading-relaxed text-slate-800 font-normal">
+                                {{ $selectedJournal->content }}
+                            </p>
+                        </div>
+
+                        <!-- AI Summary -->
+                        @if (filled($selectedJournal->summary))
+                            <div class="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-2xs">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-sm">✨</span>
+                                    <h3 class="text-xs font-bold uppercase tracking-wider text-navy">AI Key Takeaways</h3>
+                                </div>
+                                <p class="whitespace-pre-line text-sm leading-relaxed text-slate-700">
+                                    {{ $selectedJournal->summary }}
+                                </p>
+                            </div>
+                        @endif
+
+                        <!-- AI Advice / Recommendation -->
+                        @if (filled($selectedJournal->advice))
+                            <div class="rounded-2xl border border-blue-200/80 bg-gradient-to-br from-[#eef4ff] to-[#e0ecff] p-4 sm:p-5 shadow-2xs">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-sm">✦</span>
+                                    <h3 class="text-xs font-bold uppercase tracking-wider text-navy">AI Recommendation and Advice</h3>
+                                    <span class="rounded-full bg-blue-200/80 text-blue-900 text-[10px] font-bold px-2 py-0.5">Recommended</span>
+                                </div>
+                                <p class="whitespace-pre-line text-sm leading-relaxed text-navy font-medium">
+                                    {{ $selectedJournal->advice }}
+                                </p>
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Footer Action -->
+                    <div class="mt-5 flex items-center justify-between border-t border-slate-200/80 pt-4">
+                        <span class="text-xs text-slate-400 flex items-center gap-1.5">
+                            <svg class="h-3.5 w-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            <span>Encrypted & Private</span>
+                        </span>
+                        <button type="button" wire:click="closeModals" class="rounded-xl bg-navy px-5 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-navy/90 active:scale-[0.99] cursor-pointer">
+                            Close
+                        </button>
                     </div>
                 </section>
             @endif
