@@ -113,7 +113,7 @@
             @endphp
             @if ($isDefaultTheme)
                 <article wire:key="journal-{{ $journal->id }}"
-                         class="flex min-h-[88px] items-center justify-between gap-4 rounded-2xl bg-white px-5 py-3.5 shadow-sm md:px-6 transition-all {{ $isHighlighted ? 'ring-2 ring-aurea shadow-md bg-cyan-50/30' : 'border border-gray-100/60' }}">
+                         class="group flex min-h-[88px] items-center justify-between gap-4 rounded-2xl bg-white px-5 py-3.5 shadow-xs md:px-6 transition-all {{ $isHighlighted ? 'ring-2 ring-aurea shadow-md bg-cyan-50/30' : 'border border-gray-100/60 hover:shadow-sm hover:border-gray-200' }}">
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-2">
                             <p class="text-[11px] font-medium text-slate-400">{{ ($journal->journal_date ?? $journal->created_at)->format('F j, Y') }}</p>
@@ -127,35 +127,87 @@
                         </h3>
                         <p class="mt-0.5 line-clamp-2 text-xs text-slate-500">“{{ \Illuminate\Support\Str::limit($journal->content, 180) }}”</p>
                     </div>
-                    <img src="{{ asset('images/journal/'.$moodData['mascot']) }}" alt="{{ $moodData['label'] }} mood" class="h-16 w-16 shrink-0 object-contain" loading="lazy">
+                    <img src="{{ asset('images/journal/'.$moodData['mascot']) }}" alt="{{ $moodData['label'] }} mood" class="h-16 w-16 shrink-0 object-contain transition-transform duration-200 group-hover:scale-105" loading="lazy">
                 </article>
             @else
                 <article wire:key="journal-{{ $journal->id }}"
-                         class="relative flex min-h-[96px] sm:min-h-[104px] items-center justify-between rounded-2xl {{ $activeJournalTheme['card_class'] }} px-5 py-4 sm:px-6 sm:py-5 shadow-sm transition-all overflow-hidden bg-cover bg-no-repeat {{ $isHighlighted ? 'ring-2 ring-aurea shadow-md scale-[1.01]' : '' }}"
-                         style="background-image: url('{{ asset($activeJournalTheme['bg_image']) }}'); background-position: center right;">
-                    <div class="min-w-0 flex-1 pr-24 sm:pr-36 md:pr-56 z-10">
-                        <div class="flex items-center gap-2">
-                            <p class="text-[11px] {{ $activeJournalTheme['date_class'] }} flex items-center gap-1">
+                         class="group relative flex min-h-[96px] sm:min-h-[104px] items-center justify-between gap-4 rounded-2xl {{ $activeJournalTheme['card_class'] }} px-5 py-4 sm:px-6 sm:py-5 transition-all overflow-hidden {{ $isHighlighted ? 'ring-2 ring-aurea shadow-md scale-[1.01]' : '' }}">
+
+                    {{-- Atmospheric FX Layer --}}
+                    @if (!empty($activeJournalTheme['fx_type']))
+                        <div class="journal-fx journal-fx--{{ $activeJournalTheme['fx_type'] }} pointer-events-none absolute inset-0 overflow-hidden z-0" aria-hidden="true">
+                            @if ($activeJournalTheme['fx_type'] === 'sakura')
+                                <span class="journal-petal"></span>
+                                <span class="journal-petal"></span>
+                                <span class="journal-petal"></span>
+                                <span class="journal-petal"></span>
+                                <span class="journal-petal"></span>
+                                <span class="journal-petal"></span>
+                                <span class="journal-petal"></span>
+                                <span class="journal-petal"></span>
+                            @elseif ($activeJournalTheme['fx_type'] === 'snow')
+                                <span class="journal-snowflake"></span>
+                                <span class="journal-snowflake"></span>
+                                <span class="journal-snowflake"></span>
+                                <span class="journal-snowflake"></span>
+                                <span class="journal-snowflake"></span>
+                                <span class="journal-snowflake"></span>
+                                <span class="journal-snowflake"></span>
+                                <span class="journal-snowflake"></span>
+                            @elseif ($activeJournalTheme['fx_type'] === 'rain')
+                                <span class="journal-raindrop"></span>
+                                <span class="journal-raindrop"></span>
+                                <span class="journal-raindrop"></span>
+                                <span class="journal-raindrop"></span>
+                                <span class="journal-raindrop"></span>
+                                <span class="journal-raindrop"></span>
+                                <span class="journal-raindrop"></span>
+                                <span class="journal-raindrop"></span>
+                                <span class="journal-raindrop"></span>
+                            @endif
+                        </div>
+                    @endif
+
+                    {{-- Text Content Area (Clean, High Contrast, 100% Readable) --}}
+                    <div class="min-w-0 flex-1 z-10">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <p class="text-[11px] {{ $activeJournalTheme['date_class'] }} flex items-center gap-1.5">
                                 <span>{{ ($journal->journal_date ?? $journal->created_at)->format('F j, Y') }}</span>
                                 @if (!empty($activeJournalTheme['date_badge']))
-                                    <span class="text-xs">{{ $activeJournalTheme['date_badge'] }}</span>
+                                    <span class="rounded-full px-2 py-0.5 text-[10px] font-bold shadow-2xs {{ $activeJournalTheme['date_badge_class'] ?? 'bg-white/80 text-slate-700' }}">{{ $activeJournalTheme['date_badge'] }}</span>
                                 @endif
                             </p>
                             @if ($isHighlighted)
-                                <span class="rounded-full bg-white/90 text-navy px-2 py-0.5 text-[10px] font-bold shadow-xs">Selected</span>
+                                <span class="rounded-full bg-navy text-white px-2 py-0.5 text-[10px] font-bold shadow-2xs">Selected</span>
                             @endif
                         </div>
                         <h3 class="mt-1 flex items-center gap-2 text-sm sm:text-base {{ $activeJournalTheme['title_class'] }}">
                             @if (!empty($activeJournalTheme['bar_style']))
-                                <span class="h-4 w-1.5 shrink-0 rounded-full shadow-xs" style="{{ $activeJournalTheme['bar_style'] }}" aria-hidden="true"></span>
+                                <span class="h-4 w-1.5 shrink-0 rounded-full shadow-2xs" style="{{ $activeJournalTheme['bar_style'] }}" aria-hidden="true"></span>
                             @elseif (!empty($activeJournalTheme['bar_class']))
-                                <span class="h-4 w-1.5 shrink-0 rounded-full {{ $activeJournalTheme['bar_class'] }} shadow-xs" aria-hidden="true"></span>
+                                <span class="h-4 w-1.5 shrink-0 rounded-full {{ $activeJournalTheme['bar_class'] }} shadow-2xs" aria-hidden="true"></span>
                             @else
                                 <span class="h-4 w-1.5 shrink-0 rounded-full {{ $moodData['background'] }}" aria-hidden="true"></span>
                             @endif
                             <span class="truncate">{{ $journal->title }}</span>
                         </h3>
-                        <p class="mt-0.5 line-clamp-2 text-xs {{ $activeJournalTheme['content_class'] }}">“{{ \Illuminate\Support\Str::limit($journal->content, 180) }}”</p>
+                        <p class="mt-1 line-clamp-2 text-xs {{ $activeJournalTheme['content_class'] }}">“{{ \Illuminate\Support\Str::limit($journal->content, 180) }}”</p>
+                    </div>
+
+                    {{-- Clean Themed Mascot Medallion --}}
+                    <div class="relative shrink-0 z-10">
+                        <div class="relative h-16 w-16 sm:h-20 sm:w-20 rounded-2xl overflow-hidden border-2 border-white/90 bg-white/80 backdrop-blur-xs shadow-xs p-1 flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+                            @if (!empty($activeJournalTheme['mascot_badge']))
+                                <img src="{{ asset($activeJournalTheme['mascot_badge']) }}" alt="{{ $activeJournalTheme['name'] }} mascot" class="w-full h-full object-cover rounded-xl" loading="lazy">
+                            @else
+                                <img src="{{ asset('images/journal/'.$moodData['mascot']) }}" alt="{{ $moodData['label'] }} mood" class="w-full h-full object-contain" loading="lazy">
+                            @endif
+
+                            {{-- Mood mini indicator --}}
+                            <span class="absolute bottom-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white/95 shadow-xs border border-slate-100" title="{{ $moodData['label'] }} mood">
+                                <img src="{{ asset('images/journal/'.$moodData['mascot']) }}" alt="{{ $moodData['label'] }}" class="h-3.5 w-3.5 object-contain">
+                            </span>
+                        </div>
                     </div>
                 </article>
             @endif
@@ -273,12 +325,70 @@
                             @endphp
                             <div class="relative flex flex-col justify-between rounded-2xl border-2 transition-all p-3.5 bg-white shadow-xs {{ $isActive ? 'border-navy ring-2 ring-navy/20 bg-slate-50/50' : ($isLocked ? 'border-slate-200 opacity-95' : 'border-slate-200 hover:border-slate-300 hover:shadow-sm') }}">
                                 <div>
-                                    <!-- Preview Image -->
-                                    <div class="relative aspect-[4/1] w-full rounded-xl overflow-hidden border border-slate-100 bg-slate-100 mb-3">
-                                        <img src="{{ asset($theme['preview']) }}" alt="{{ $theme['name'] }} preview" class="w-full h-full object-cover">
+                                    <!-- Live Mini Card Preview -->
+                                    <div class="relative min-h-[82px] w-full rounded-xl overflow-hidden p-3 transition-all flex items-center justify-between border {{ $theme['card_class'] }} mb-3">
+                                        @if (!empty($theme['fx_type']))
+                                            <div class="journal-fx journal-fx--{{ $theme['fx_type'] }} pointer-events-none absolute inset-0 overflow-hidden z-0" aria-hidden="true">
+                                                @if ($theme['fx_type'] === 'sakura')
+                                                    <span class="journal-petal"></span>
+                                                    <span class="journal-petal"></span>
+                                                    <span class="journal-petal"></span>
+                                                    <span class="journal-petal"></span>
+                                                    <span class="journal-petal"></span>
+                                                    <span class="journal-petal"></span>
+                                                @elseif ($theme['fx_type'] === 'snow')
+                                                    <span class="journal-snowflake"></span>
+                                                    <span class="journal-snowflake"></span>
+                                                    <span class="journal-snowflake"></span>
+                                                    <span class="journal-snowflake"></span>
+                                                    <span class="journal-snowflake"></span>
+                                                    <span class="journal-snowflake"></span>
+                                                @elseif ($theme['fx_type'] === 'rain')
+                                                    <span class="journal-raindrop"></span>
+                                                    <span class="journal-raindrop"></span>
+                                                    <span class="journal-raindrop"></span>
+                                                    <span class="journal-raindrop"></span>
+                                                    <span class="journal-raindrop"></span>
+                                                    <span class="journal-raindrop"></span>
+                                                @endif
+                                            </div>
+                                        @endif
 
-                                        <!-- Top-Right Badge -->
-                                        <div class="absolute top-2 right-2 flex items-center gap-1">
+                                        <div class="min-w-0 flex-1 z-10 pr-2">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="text-[10px] font-semibold {{ $theme['date_class'] }}">October 14, 2026</span>
+                                                @if (!empty($theme['date_badge']))
+                                                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full {{ $theme['date_badge_class'] ?? 'bg-slate-100 text-slate-700' }}">{{ $theme['date_badge'] }}</span>
+                                                @endif
+                                            </div>
+                                            <div class="mt-1 flex items-center gap-1.5">
+                                                @if (!empty($theme['bar_style']))
+                                                    <span class="h-3.5 w-1 shrink-0 rounded-full" style="{{ $theme['bar_style'] }}"></span>
+                                                @elseif (!empty($theme['bar_class']))
+                                                    <span class="h-3.5 w-1 shrink-0 rounded-full {{ $theme['bar_class'] }}"></span>
+                                                @else
+                                                    <span class="h-3.5 w-1 shrink-0 rounded-full bg-aurea"></span>
+                                                @endif
+                                                <span class="text-xs font-bold truncate {{ $theme['title_class'] }}">A quiet reflection</span>
+                                            </div>
+                                            <div class="mt-1 space-y-1">
+                                                <div class="h-1.5 w-4/5 rounded-full bg-slate-200/70"></div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Right Mascot Badge -->
+                                        <div class="relative shrink-0 z-10">
+                                            @if (!empty($theme['mascot_badge']))
+                                                <div class="h-12 w-12 rounded-xl overflow-hidden border border-white/90 shadow-2xs bg-white/80 p-0.5 flex items-center justify-center">
+                                                    <img src="{{ asset($theme['mascot_badge']) }}" alt="{{ $theme['name'] }} mascot" class="w-full h-full object-cover rounded-lg" loading="lazy">
+                                                </div>
+                                            @else
+                                                <img src="{{ asset('images/journal/maskot-journal1.png') }}" alt="Classic mascot" class="h-11 w-11 object-contain" loading="lazy">
+                                            @endif
+                                        </div>
+
+                                        <!-- Top-Right Status Badge (Active / PRO / Free) -->
+                                        <div class="absolute top-1.5 right-1.5 z-20">
                                             @if ($isActive)
                                                 <span class="rounded-full bg-navy text-white text-[10px] font-extrabold px-2 py-0.5 shadow-sm flex items-center gap-1">
                                                     <span>✓</span>

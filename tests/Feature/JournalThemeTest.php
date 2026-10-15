@@ -81,7 +81,7 @@ it('allows premium students to select any journal theme', function (string $them
     if ($themeKey === 'default') {
         $response->assertSee(asset('images/journal/maskot-journal3.png'), false);
     } else {
-        $response->assertSee(asset("images/journal/themes/{$themeKey}/card-bg.jpg"), false);
+        $response->assertSee(asset("images/journal/themes/{$themeKey}/mascot-badge.jpg"), false);
     }
 })->with([
     'sakura' => ['sakura', 'Cherry Blossom'],
