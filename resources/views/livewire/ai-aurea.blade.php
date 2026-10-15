@@ -1,4 +1,42 @@
-<div @if ($shouldSendPrefilledMessage) wire:init="sendPrefilledMessage" @endif class="relative flex min-h-full flex-col overflow-hidden bg-gradient-to-b from-[#f2f4fa] via-[#f2f4fa] to-[#64ded9]">
+<div @if ($shouldSendPrefilledMessage) wire:init="sendPrefilledMessage" @endif 
+     x-data="{
+         isThinking: false,
+         pendingUserMessage: '',
+         send() {
+             const input = this.$refs.inputField;
+             const text = (input ? input.value : '').trim();
+             if (!text || this.isThinking) return;
+
+             this.pendingUserMessage = text;
+             this.isThinking = true;
+             if (input) input.value = '';
+
+             this.scrollToBottom();
+
+             $wire.sendMessage(text).then(() => {
+                 this.pendingUserMessage = '';
+                 this.isThinking = false;
+                 this.scrollToBottom();
+                 this.$nextTick(() => {
+                     if (this.$refs.inputField) this.$refs.inputField.focus();
+                 });
+             }).catch(() => {
+                 this.isThinking = false;
+             });
+         },
+         scrollToBottom() {
+             this.$nextTick(() => {
+                 const container = this.$refs.chatContainer;
+                 if (container) {
+                     container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+                 }
+             });
+         }
+     }"
+     x-init="scrollToBottom()"
+     @chat-reset.window="isThinking = false; pendingUserMessage = '';"
+     @chat-loaded.window="scrollToBottom()"
+     class="relative flex min-h-full flex-col overflow-hidden bg-gradient-to-b from-[#f2f4fa] via-[#f2f4fa] to-[#64ded9]">
     <div class="relative z-20 flex items-center justify-end gap-2">
         <button type="button" wire:click="newChat" aria-label="New chat" title="New chat" class="flex h-10 w-10 items-center justify-center rounded-full bg-white/80 text-navy shadow-sm transition hover:bg-white">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -57,20 +95,46 @@
                         Aurea is preparing a response...
                     </span>
                 </div>
-            @elseif (count($messages) === 0)
-                <p class="text-center text-2xl font-medium leading-snug text-navy md:text-3xl">Hi {{ $firstName }}, what's on your mind today?</p>
             @else
-                <div class="max-h-[52dvh] space-y-5 overflow-y-auto px-1 py-2" aria-live="polite">
+                {{-- Welcome screen when no messages and not thinking --}}
+                <div x-show="!isThinking && {{ count($messages) === 0 ? 'true' : 'false' }}" class="my-auto text-center">
+                    <p class="text-center text-2xl font-medium leading-snug text-navy md:text-3xl">Hi {{ $firstName }}, what's on your mind today?</p>
+                </div>
+
+                {{-- Messages conversation area --}}
+                <div x-show="isThinking || {{ count($messages) > 0 ? 'true' : 'false' }}" 
+                     x-ref="chatContainer"
+                     class="max-h-[52dvh] space-y-5 overflow-y-auto px-1 py-2 scroll-smooth" 
+                     aria-live="polite">
                     @foreach ($messages as $chatMessage)
                         <div wire:key="chat-message-{{ $chatMessage['id'] }}" class="flex {{ $chatMessage['role'] === 'user' ? 'justify-end' : 'justify-start' }}">
                             @if ($chatMessage['role'] === 'assistant')
-                                <div class="mr-3 mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white p-1.5">
+                                <div class="mr-3 mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white p-1.5 shadow-xs">
                                     <img src="{{ asset('images/AI_AUREA.png') }}" alt="Aurea" class="h-full w-full object-contain">
                                 </div>
                             @endif
                             <p class="max-w-[85%] whitespace-pre-line rounded-[24px] px-5 py-3 text-sm leading-relaxed {{ $chatMessage['role'] === 'user' ? 'bg-[#64ded9] text-navy' : 'bg-white/80 text-navy shadow-sm' }}">{{ $chatMessage['content'] }}</p>
                         </div>
                     @endforeach
+
+                    {{-- Optimistic user message bubble while thinking --}}
+                    <template x-if="isThinking && pendingUserMessage">
+                        <div class="flex justify-end">
+                            <p class="max-w-[85%] whitespace-pre-line rounded-[24px] px-5 py-3 text-sm leading-relaxed bg-[#64ded9] text-navy shadow-xs" x-text="pendingUserMessage"></p>
+                        </div>
+                    </template>
+
+                    {{-- Gemini-style thinking / loading indicator --}}
+                    <template x-if="isThinking">
+                        <div class="flex justify-start items-center">
+                            <div class="mr-3 mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white p-1.5 shadow-xs">
+                                <img src="{{ asset('images/AI_AUREA.png') }}" alt="Aurea" class="h-full w-full object-contain">
+                            </div>
+                            <div class="rounded-[24px] bg-white/90 backdrop-blur-xs px-4 py-3 text-navy shadow-sm inline-flex items-center gap-1.5">
+                                <x-ui.message-loading class="w-5 h-5 text-[#00bfc3]" />
+                            </div>
+                        </div>
+                    </template>
                 </div>
             @endif
         </section>
@@ -82,13 +146,35 @@
             </div>
         @endif
 
-        <form wire:submit.prevent="sendMessage" class="mx-auto flex w-full items-center gap-2 rounded-full bg-white p-2 pl-6 shadow-[0_12px_35px_rgba(6,24,55,0.12)]">
+        <form @submit.prevent="send()" wire:submit.prevent="sendMessage" class="mx-auto flex w-full items-center gap-2 rounded-full bg-white p-2 pl-6 shadow-[0_12px_35px_rgba(6,24,55,0.12)]">
             <label for="ai-message" class="sr-only">Message for Aurea</label>
-            <input id="ai-message" type="text" wire:model="message" placeholder="Type your message here..." maxlength="2000" @disabled(! $isPremium && $remainingPrompts === 0) class="min-w-0 flex-1 border-0 bg-transparent py-2 text-sm text-navy placeholder:text-gray-400 focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50">
-            <button type="submit" wire:loading.attr="disabled" wire:target="sendMessage" @disabled(! $isPremium && $remainingPrompts === 0) aria-label="Send message" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-navy text-white transition hover:bg-navy/90 disabled:cursor-not-allowed disabled:opacity-50">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m4 4 16 8-16 8 3-8-3-8zm3 8h13" />
-                </svg>
+            <input id="ai-message" 
+                   x-ref="inputField"
+                   type="text" 
+                   wire:model="message" 
+                   :placeholder="isThinking ? 'Aurea is thinking...' : 'Type your message here...'" 
+                   maxlength="2000" 
+                   :disabled="isThinking || {{ (! $isPremium && $remainingPrompts === 0) ? 'true' : 'false' }}" 
+                   @disabled(! $isPremium && $remainingPrompts === 0) 
+                   class="min-w-0 flex-1 border-0 bg-transparent py-2 text-sm text-navy placeholder:text-gray-400 focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50">
+            <button type="submit" 
+                    :disabled="isThinking || {{ (! $isPremium && $remainingPrompts === 0) ? 'true' : 'false' }}" 
+                    wire:loading.attr="disabled" 
+                    wire:target="sendMessage" 
+                    @disabled(! $isPremium && $remainingPrompts === 0) 
+                    aria-label="Send message" 
+                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-navy text-white transition hover:bg-navy/90 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer">
+                <template x-if="!isThinking">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m4 4 16 8-16 8 3-8-3-8zm3 8h13" />
+                    </svg>
+                </template>
+                <template x-if="isThinking">
+                    <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </template>
             </button>
         </form>
         @error('message')

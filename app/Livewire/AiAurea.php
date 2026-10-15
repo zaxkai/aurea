@@ -49,8 +49,14 @@ class AiAurea extends Component
         }
     }
 
-    public function sendMessage(ChatbotService $chatbot): void
+    public function sendMessage(?string $userMessage = null, ?ChatbotService $chatbot = null): void
     {
+        $chatbot ??= $this->chatbotService ?? app(ChatbotService::class);
+
+        if ($userMessage !== null && trim($userMessage) !== '') {
+            $this->message = trim($userMessage);
+        }
+
         $validated = $this->validate([
             'message' => ['required', 'string', 'max:2000'],
         ]);
@@ -114,7 +120,7 @@ class AiAurea extends Component
         }
 
         $this->shouldSendPrefilledMessage = false;
-        $this->sendMessage($chatbot);
+        $this->sendMessage(null, $chatbot);
     }
 
     public function newChat(): void
@@ -124,6 +130,7 @@ class AiAurea extends Component
         $this->message = '';
         $this->showHistory = false;
         $this->resetErrorBag();
+        $this->dispatch('chat-reset');
     }
 
     public function toggleHistory(): void
@@ -150,6 +157,7 @@ class AiAurea extends Component
             ])
             ->all();
         $this->showHistory = false;
+        $this->dispatch('chat-loaded');
     }
 
     public function render(): View
