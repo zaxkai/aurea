@@ -142,46 +142,71 @@ it('allows user to log out from settings', function () {
     $this->assertGuest();
 });
 
-it('displays B2B paywall for free teachers and unlocks upon demo subscription activation', function () {
+it('displays B2B paywall for free teachers and unlocks upon demo subscription activation via dedicated premium page', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
 
-    // 1. Free teacher initially sees paywall disclaimer and lock indicators
-    $component = Livewire::actingAs($teacher)
+    // 1. Free teacher initially sees paywall teaser banner and lock indicators in dashboard
+    Livewire::actingAs($teacher)
         ->test(TeacherDashboard::class)
         ->assertSee('B2B (Sekolah) • Layanan Berbayar')
         ->assertSee('Deteksi Dini', false)
-        ->assertSee('Buka Paket Berlangganan');
+        ->assertSee('Analitik Guru BK', false)
+        ->assertSee('Buka Halaman Premium Sekolah')
+        ->assertSee('Buka Paket Berlangganan (Simulasi Demo)');
 
     expect($teacher->fresh()->isPremium())->toBeFalse();
 
-    // 2. Open subscription modal and verify paid service in demo stage disclaimer
-    $component->call('openSubscriptionModal')
-        ->assertSet('showSubscriptionModal', true)
+    // 2. Free teacher visits dedicated /premium page
+    $this->actingAs($teacher)
+        ->get(route('premium'))
+        ->assertOk()
+        ->assertSee('AUREA', false)
+        ->assertSee('for School', false)
+        ->assertSee('Paket Semester')
+        ->assertSee('Rp 1.500.000')
+        ->assertSee('Paket Tahunan')
+        ->assertSee('Rp 2.500.000')
         ->assertSee('Layanan Berlangganan Berbayar (Tahap Uji Coba Demo)')
-        ->call('selectPlan', 'yearly')
-        ->assertSet('selectedPlan', 'yearly')
-        ->call('activateDemoSubscription')
-        ->assertSet('showSubscriptionModal', false)
-        ->assertSee('Paket B2B Sekolah Aktif');
+        ->assertSee('Simulasikan Pembayaran', false);
+
+    // 3. Simulate activation via dedicated premium route
+    $this->actingAs($teacher)
+        ->post(route('premium.activate'), ['plan' => 'yearly'])
+        ->assertRedirect(route('premium'))
+        ->assertSessionHas('success');
 
     expect($teacher->fresh()->isPremium())->toBeTrue();
 
-    // 3. Reset demo subscription back to free
-    $component->call('resetDemoSubscription')
-        ->assertSee('Akun Free • Berlangganan B2B');
+    // 4. Premium teacher now sees active status on dashboard and student wellbeing
+    Livewire::actingAs($teacher->fresh())
+        ->test(TeacherDashboard::class)
+        ->assertSee('Paket B2B Sekolah Aktif')
+        ->assertDontSee('B2B (Sekolah) • Layanan Berbayar');
+
+    Livewire::actingAs($teacher->fresh())
+        ->test(StudentWellbeing::class)
+        ->assertSee('Paket B2B Sekolah Aktif')
+        ->assertDontSee('B2B (Sekolah) • Layanan Berbayar');
+
+    // 5. Deactivate / reset back to free
+    $this->actingAs($teacher->fresh())
+        ->post(route('premium.deactivate'))
+        ->assertRedirect(route('premium'))
+        ->assertSessionHas('info');
 
     expect($teacher->fresh()->isPremium())->toBeFalse();
 });
 
-it('displays paywall on student wellbeing page for free teachers and unlocks when subscribed', function () {
+it('displays paywall teaser on student wellbeing page for free teachers and links to dedicated premium page', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
 
     Livewire::actingAs($teacher)
         ->test(StudentWellbeing::class)
-        ->assertSee('Deteksi Dini Siswa Terkunci')
-        ->assertSee('Buka Paket Berlangganan')
-        ->call('activateDemoSubscription')
-        ->assertSee('Paket B2B Sekolah Aktif');
+        ->assertSee('B2B (Sekolah) • Layanan Berbayar')
+        ->assertSee('Deteksi Dini Siswa', false)
+        ->assertSee('Analitik Kesejahteraan', false)
+        ->assertSee('Buka Halaman Premium Sekolah')
+        ->assertSee('Buka Paket Berlangganan (Simulasi Demo)');
 
-    expect($teacher->fresh()->isPremium())->toBeTrue();
+    expect($teacher->fresh()->isPremium())->toBeFalse();
 });

@@ -27,10 +27,11 @@
                     Hello, {{ auth()->user()->first_name ?? 'Teacher' }}
                 </h1>
                 @if (auth()->user()->isPremium())
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 shadow-2xs">
+                    <a href="{{ route('premium') }}"
+                       class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 shadow-2xs hover:bg-amber-200 transition-colors">
                         <span>✨</span>
                         <span>Paket B2B Sekolah Aktif</span>
-                    </span>
+                    </a>
                     <button type="button"
                             wire:click="resetDemoSubscription"
                             title="Kembalikan ke Akun Free untuk simulasi presentasi paywall"
@@ -38,12 +39,11 @@
                         (Reset ke Free)
                     </button>
                 @else
-                    <button type="button"
-                            wire:click="openSubscriptionModal"
-                            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-300 transition-colors shadow-2xs cursor-pointer">
+                    <a href="{{ route('premium') }}"
+                       class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-300 transition-colors shadow-2xs">
                         <span>🔒</span>
                         <span>Akun Free • Berlangganan B2B</span>
-                    </button>
+                    </a>
                 @endif
             </div>
             <p class="text-gray-500 font-medium text-sm mt-1">
@@ -191,7 +191,30 @@
         </div>
     </div>
 
-    <!-- Mood Overview Section (Matching Mockup with B2B Paywall) -->
+    <!-- B2B Subscription Teaser Banner for Free Teachers -->
+    @if (! auth()->user()->isPremium())
+        <div class="bg-gradient-to-r from-blue-50/90 via-white to-amber-50/80 border border-amber-200/90 rounded-[28px] p-6 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-5 shadow-xs">
+            <div class="space-y-1.5 text-center sm:text-left">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-200 uppercase tracking-wider">
+                    <span>🔒</span>
+                    <span>B2B (Sekolah) • Layanan Berbayar</span>
+                </span>
+                <h3 class="text-xl sm:text-2xl font-black text-[#000F2E] tracking-tight">
+                    Deteksi Dini & Analitik Guru BK
+                </h3>
+                <p class="text-xs sm:text-sm text-gray-600 max-w-xl leading-relaxed">
+                    Buka analitik tren burnout siswa per angkatan secara kolektif tanpa melanggar privasi obrolan individu melalui paket kemitraan sekolah.
+                </p>
+            </div>
+            <a href="{{ route('premium') }}"
+               class="inline-flex items-center gap-2 bg-[#000F2E] text-white font-bold text-xs sm:text-sm px-6 py-3.5 rounded-2xl shadow-md hover:bg-[#001744] active:scale-95 transition-all shrink-0">
+                <span>⭐</span>
+                <span>Buka Halaman Premium Sekolah</span>
+            </a>
+        </div>
+    @endif
+
+    <!-- Mood Overview Section -->
     <div class="space-y-4">
         <div class="flex items-center justify-between">
             <div>
@@ -199,54 +222,22 @@
                 <p class="text-gray-500 font-medium text-xs sm:text-sm">An overview of students' reported moods this week</p>
             </div>
             @if (! auth()->user()->isPremium())
-                <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1.5 shadow-2xs">
+                <a href="{{ route('premium') }}" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 hover:bg-amber-200 border border-amber-300 flex items-center gap-1.5 shadow-2xs transition-colors">
                     <span>🔒</span>
                     <span>Layanan Berbayar B2B Sekolah</span>
-                </span>
+                </a>
             @endif
         </div>
 
         <div class="relative rounded-[28px] overflow-hidden">
             @if (! auth()->user()->isPremium())
-                <!-- Paywall Overlay Card -->
-                <div class="absolute inset-0 z-20 bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-4">
-                    <div class="max-w-lg w-full bg-white/95 rounded-[28px] p-6 sm:p-7 shadow-2xl text-center space-y-4 border border-amber-300/80">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-[11px] font-black uppercase tracking-wider">
-                            <span>🏫</span>
-                            <span>B2B (Sekolah) • Layanan Berbayar</span>
-                        </div>
-
-                        <div class="space-y-1">
-                            <h3 class="text-xl sm:text-2xl font-black text-[#000F2E] tracking-tight">
-                                Deteksi Dini & Analitik Guru BK
-                            </h3>
-                            <p class="text-xs text-gray-600 leading-relaxed max-w-sm mx-auto">
-                                Buka analitik tren burnout siswa per angkatan secara kolektif tanpa melanggar privasi obrolan individu.
-                            </p>
-                        </div>
-
-                        <div class="text-left text-xs space-y-1.5 bg-gray-50 p-3.5 rounded-2xl border border-gray-100 text-gray-700">
-                            <div class="flex items-start gap-2">
-                                <span class="text-amber-500 font-bold">✦</span>
-                                <span><strong>Sistem Berlangganan:</strong> Sekolah membayar biaya subscription per semester/tahun.</span>
-                            </div>
-                            <div class="flex items-start gap-2">
-                                <span class="text-amber-500 font-bold">✦</span>
-                                <span><strong>Akses Eksklusif:</strong> Membuka dashboard analitik khusus untuk Guru BK.</span>
-                            </div>
-                            <div class="flex items-start gap-2">
-                                <span class="text-amber-500 font-bold">✦</span>
-                                <span><strong>Deteksi Dini:</strong> Memantau tren burnout siswa tanpa melanggar privasi obrolan individu.</span>
-                            </div>
-                        </div>
-
-                        <button type="button"
-                                wire:click="openSubscriptionModal"
-                                class="w-full inline-flex items-center justify-center gap-2 bg-[#000F2E] text-white font-bold text-xs sm:text-sm py-3 px-5 rounded-2xl shadow-lg hover:bg-[#001744] active:scale-95 transition-all cursor-pointer">
-                            <span>💳</span>
-                            <span>Buka Paket Berlangganan (Simulasi Demo)</span>
-                        </button>
-                    </div>
+                <!-- Subtle centered unlock button over soft blur, no clipped card -->
+                <div class="absolute inset-0 z-10 bg-slate-900/30 backdrop-blur-[2px] flex items-center justify-center p-4">
+                    <a href="{{ route('premium') }}"
+                       class="inline-flex items-center gap-2 bg-[#000F2E] text-white font-bold text-xs sm:text-sm py-3.5 px-6 rounded-2xl shadow-xl hover:bg-[#001744] active:scale-95 transition-all border border-amber-300/40">
+                        <span>💳</span>
+                        <span>Buka Paket Berlangganan (Simulasi Demo)</span>
+                    </a>
                 </div>
             @endif
 
@@ -294,7 +285,7 @@
                     </div>
                     <button type="button"
                             wire:click="$set('showCreateModal', false)"
-                            class="w-8 h-8 rounded-full text-gray-400 hover:text-navy hover:bg-gray-100 flex items-center justify-center transition-colors">
+                            class="w-8 h-8 rounded-full text-gray-400 hover:text-navy hover:bg-gray-100 flex items-center justify-center transition-colors cursor-pointer">
                         ✕
                     </button>
                 </div>
@@ -330,112 +321,16 @@
                     <div class="pt-2 flex items-center justify-end gap-3">
                         <button type="button"
                                 wire:click="$set('showCreateModal', false)"
-                                class="px-4 py-2.5 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 transition-colors">
+                                class="px-4 py-2.5 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer">
                             Cancel
                         </button>
                         <button type="submit"
-                                class="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#000F2E] text-white hover:bg-[#001b3d] shadow-md transition-all">
+                                class="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#000F2E] text-white hover:bg-[#001b3d] shadow-md transition-all cursor-pointer">
                             Generate Classroom & Code
                         </button>
                     </div>
                 </form>
             </div>
-            </div>
-        </div>
-    @endif
-
-    <!-- Modal: B2B School Subscription (Demo Simulation) -->
-    @if ($showSubscriptionModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto"
-             x-data
-             @keydown.escape.window="$wire.set('showSubscriptionModal', false)">
-            <!-- Full-screen Backdrop -->
-            <div class="fixed inset-0 bg-[#000F2E]/60 backdrop-blur-xs transition-opacity" wire:click="closeSubscriptionModal" aria-hidden="true"></div>
-
-            <div class="relative flex min-h-full items-center justify-center p-4">
-                <div class="bg-white rounded-[32px] max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-6 relative border border-gray-100">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[11px] font-black uppercase tracking-wider mb-1.5 border border-amber-200">
-                                Kemitraan Sekolah (B2B)
-                            </span>
-                            <h3 class="text-2xl font-black text-[#000F2E] tracking-tight">Paket Berlangganan Guru BK</h3>
-                            <p class="text-xs text-gray-500 mt-0.5">Pilih paket lisensi kemitraan sekolah untuk akses dashboard analitik lengkap.</p>
-                        </div>
-                        <button type="button"
-                                wire:click="closeSubscriptionModal"
-                                class="w-8 h-8 rounded-full text-gray-400 hover:text-navy hover:bg-gray-100 flex items-center justify-center transition-colors cursor-pointer">
-                            ✕
-                        </button>
-                    </div>
-
-                    <!-- Plan Selection -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <button type="button"
-                                wire:click="selectPlan('semester')"
-                                class="p-4 rounded-2xl border-2 text-left transition-all cursor-pointer {{ $selectedPlan === 'semester' ? 'border-[#000F2E] bg-blue-50/50 shadow-sm' : 'border-gray-200 hover:border-gray-300' }}">
-                            <div class="text-xs font-bold text-gray-500">Paket Semester</div>
-                            <div class="text-lg font-black text-[#000F2E] mt-1">Rp 1.500.000</div>
-                            <div class="text-[11px] text-gray-500 mt-0.5">per semester (6 bulan)</div>
-                        </button>
-
-                        <button type="button"
-                                wire:click="selectPlan('yearly')"
-                                class="p-4 rounded-2xl border-2 text-left transition-all relative overflow-hidden cursor-pointer {{ $selectedPlan === 'yearly' ? 'border-[#000F2E] bg-blue-50/50 shadow-sm' : 'border-gray-200 hover:border-gray-300' }}">
-                            <span class="absolute top-2 right-2 text-[10px] font-black bg-emerald-500 text-white px-2 py-0.5 rounded-full">Hemat 16%</span>
-                            <div class="text-xs font-bold text-gray-500">Paket Tahunan</div>
-                            <div class="text-lg font-black text-[#000F2E] mt-1">Rp 2.500.000</div>
-                            <div class="text-[11px] text-gray-500 mt-0.5">per tahun (12 bulan)</div>
-                        </button>
-                    </div>
-
-                    <!-- Features Included -->
-                    <div class="bg-gray-50 rounded-2xl p-4 text-xs space-y-2 text-gray-700 border border-gray-100">
-                        <div class="font-bold text-[#000F2E] mb-1">Akses Eksklusif yang Didapatkan:</div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-emerald-600 font-bold">✓</span>
-                            <span>Dashboard Analitik Kesejahteraan Siswa & Guru BK</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-emerald-600 font-bold">✓</span>
-                            <span>Deteksi Dini Tren Burnout Siswa per Angkatan</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-emerald-600 font-bold">✓</span>
-                            <span>Indikator Siswa yang Memerlukan Perhatian (Need Attention)</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-emerald-600 font-bold">✓</span>
-                            <span>Perlindungan Privasi: Tanpa melanggar obrolan pribadi siswa</span>
-                        </div>
-                    </div>
-
-                    <!-- Demo Simulation Disclaimer (Explicitly highlighting paid model in demo stage) -->
-                    <div class="bg-amber-50 border border-amber-300 rounded-2xl p-4 text-xs text-amber-900 space-y-1.5">
-                        <div class="font-bold flex items-center gap-1.5 text-amber-950">
-                            <span>💳</span>
-                            <span>Layanan Berlangganan Berbayar (Tahap Uji Coba Demo)</span>
-                        </div>
-                        <p class="leading-relaxed text-[11px]">
-                            Fitur ini merupakan layanan berbayar kemitraan B2B untuk sekolah. Sistem transaksi pembayaran saat ini masih dalam <strong>tahap demo / uji coba inovasi</strong>, sehingga Anda dapat melakukan <strong>simulasi pembayaran</strong> untuk mengaktifkan seluruh fitur analitik tanpa pemotongan biaya riil.
-                        </p>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="flex items-center justify-end gap-3 pt-1">
-                        <button type="button"
-                                wire:click="closeSubscriptionModal"
-                                class="px-4 py-2.5 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer">
-                            Batal
-                        </button>
-                        <button type="button"
-                                wire:click="activateDemoSubscription"
-                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-[#000F2E] text-white hover:bg-[#001744] shadow-md transition-all active:scale-95 cursor-pointer">
-                            <span>💳</span>
-                            <span>Simulasikan Pembayaran & Aktifkan</span>
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     @endif

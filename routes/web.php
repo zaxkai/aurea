@@ -61,6 +61,7 @@ Route::view('settings', 'settings')
 Route::middleware('auth')->group(function () {
     Route::get('premium', [PremiumController::class, 'index'])->name('premium');
     Route::post('premium/activate', [PremiumController::class, 'activate'])->name('premium.activate');
+    Route::post('premium/deactivate', [PremiumController::class, 'deactivate'])->name('premium.deactivate');
 });
 
 Route::post('check-in', [CheckInController::class, 'store'])
