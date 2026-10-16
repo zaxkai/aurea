@@ -179,6 +179,8 @@ it('allows teachers to search enrolled students in their classroom', function ()
         ->assertSee('Alex Turner')
         ->assertSee('Class 10-A')
         ->call('selectStudent', 'Alex Turner')
+        ->assertRedirect(route('teacher.students', ['search' => 'Alex Turner']))
+        ->call('selectStudent', $student->id)
         ->assertRedirect(route('teacher.students', ['search' => 'Alex Turner']));
 });
 

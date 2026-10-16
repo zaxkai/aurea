@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Journal;
+use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
