@@ -24,11 +24,10 @@ class ChatbotService
 
     // Coba model tercepat dan stabil dulu, fallback jika overload
     protected array $models = [
+        'gemini-3-flash-preview',
+        'gemini-3.5-flash',
         'gemini-flash-lite-latest',
         'gemini-3.5-flash-lite',
-        'gemini-3.1-flash-lite',
-        'gemini-2.5-flash-lite',
-        'gemini-3.8-flash',
     ];
 
     /**
@@ -68,13 +67,22 @@ class ChatbotService
         }
 
         foreach ($this->getModels() as $model) {
+            $generationConfig = [
+                'temperature' => 0.7,
+                'maxOutputTokens' => 450,
+            ];
+
+            if (! str_contains($model, 'lite')) {
+                $generationConfig['thinkingConfig'] = ['thinkingBudget' => 0];
+            }
+
             try {
-                $response = Http::timeout(7)
+                $response = Http::timeout(20)
                     ->withHeaders(['x-goog-api-key' => $apiKey])
                     ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", [
                         'system_instruction' => ['parts' => [['text' => $this->getSystemPrompt($userMessage)]]],
                         'contents' => $contents,
-                        'generationConfig' => ['temperature' => 0.7, 'maxOutputTokens' => 300],
+                        'generationConfig' => $generationConfig,
                     ]);
             } catch (\Throwable $e) {
                 Log::error("Chatbot error pakai model {$model}: ".$e->getMessage());
@@ -149,17 +157,23 @@ class ChatbotService
         $prompt = "Mood yang dipilih: {$mood}\n\nCatatan jurnal pengguna:\n{$journalContent}\n\nBuat ringkasan yang setia pada isi catatan dan satu saran kecil yang hangat, praktis, tidak menghakimi, serta tidak mendiagnosis. Balas hanya JSON dengan properti string summary dan advice.";
 
         foreach ($this->getModels() as $model) {
+            $generationConfig = [
+                'temperature' => 0.4,
+                'maxOutputTokens' => 400,
+                'responseMimeType' => 'application/json',
+            ];
+
+            if (! str_contains($model, 'lite')) {
+                $generationConfig['thinkingConfig'] = ['thinkingBudget' => 0];
+            }
+
             try {
-                $response = Http::timeout(7)
+                $response = Http::timeout(20)
                     ->withHeaders(['x-goog-api-key' => $apiKey])
                     ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", [
                         'system_instruction' => ['parts' => [['text' => 'Kamu adalah Aurea, pendamping journaling yang hangat untuk remaja. Gunakan bahasa utama yang sama dengan isi catatan jurnal untuk summary dan advice; abaikan bahasa instruksi, label mood, dan properti JSON. Jaga privasi, jangan mendiagnosis atau menyarankan obat. Jika catatan mengandung risiko menyakiti diri, sarankan menghubungi orang dewasa tepercaya atau bantuan darurat.']]],
                         'contents' => [['role' => 'user', 'parts' => [['text' => $prompt]]]],
-                        'generationConfig' => [
-                            'temperature' => 0.4,
-                            'maxOutputTokens' => 400,
-                            'responseMimeType' => 'application/json',
-                        ],
+                        'generationConfig' => $generationConfig,
                     ]);
 
                 if (in_array($response->status(), [429, 503])) {

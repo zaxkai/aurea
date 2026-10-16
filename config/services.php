@@ -37,14 +37,17 @@ return [
 
     'gemini' => [
         'key' => env('GEMINI_API_KEY'),
-        'models' => array_values(array_unique([
-            env('GEMINI_MODEL', 'gemini-flash-lite-latest'),
-            'gemini-flash-lite-latest',
-            'gemini-3.5-flash-lite',
-            'gemini-3.1-flash-lite',
-            'gemini-2.5-flash-lite',
-            'gemini-3.8-flash',
-        ])),
+        'models' => array_values(array_filter(array_unique(
+            env('GEMINI_MODELS')
+                ? array_map('trim', explode(',', env('GEMINI_MODELS')))
+                : [
+                    env('GEMINI_MODEL', 'gemini-3-flash-preview'),
+                    'gemini-3-flash-preview',
+                    'gemini-3.5-flash',
+                    'gemini-flash-lite-latest',
+                    'gemini-3.5-flash-lite',
+                ]
+        ))),
     ],
 
 ];
